@@ -1,0 +1,41 @@
+What is a ProductRepository and why use it?
+ >>>>> public interface ProductRepository extends JpaRepository<Product, Long> { } <<<<<
+
+-It’s a Spring Data JPA repository interface.
+-Spring auto-generates the implementation at runtime.
+-You get CRUD (save, findById, findAll, delete…) without writing SQL.
+-You can add derived queries like findByName(String name) and Spring builds them for you.
+-Benefit: less boilerplate, clean separation, and easy unit testing (you can mock the repository in service tests).
+-----------------------------------------
+Annotations
+@Entity
+Marks the class as a JPA entity mapped to a DB table (e.g., product).
+@Id
+Primary key field.
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+DB generates the PK (typical for PostgreSQL SERIAL/identity columns).
+@JoinColumn(name = "category_id")
+Name of the FK column in the product table.
+@OneToMany(mappedBy = "category")
+In Category, declares the inverse side of the relation. mappedBy points to the field name in Product that owns the relation.
+-----------------------------------------
+Lombok – lombok.*
+@Data
+Generates getters, setters, toString, equals, hashCode.
+@NoArgsConstructor
+Zero-args constructor (needed by JPA).
+@AllArgsConstructor
+All-args constructor.
+@Builder
+Fluent builder for creating instances: Product.builder().name("A").build().
+-----------------------------------------
+com.eshop.api
+├── api               ← controllers
+├── config            ← security, CORS
+├── domain            ← JPA entities
+├── dto               ← API DTOs
+├── exception         ← handlers
+├── repository        ← your JpaRepository interfaces
+├── service           ← service interfaces
+│   └── impl          ← service implementations
+└── util              ← helpers (JWT, etc.)

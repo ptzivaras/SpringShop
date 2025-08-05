@@ -1,0 +1,50 @@
+Java: 21 LTS
+SpringBoot: 3.3.x latest stable in 2025
+JPA Hibernate
+Spring Security with JWT
+PostGre
+React Vite
+State management: RTK Querry Redux Toolkit QUery
+API Axios or Fetch
+Payment Stripe
+
+------------
+Backend
+Authentication (JWT): register, login, role-based access
+REST APIs (CRUD): products, categories, orders, cart
+Transactions: stock update on order
+Exception handling: @ControllerAdvice
+Testing: unit tests (JUnit + Mockito), integration tests (Testcontainers or H2)
+
+Frontend
+Auth flow with JWT (store in HTTP-only cookie or localStorage)
+Product listing by category
+Cart functionality with RTK Query
+Order placement and confirmation
+Admin panel for product/category CRUD
+Language switcher (i18next)
+
+Dependencies to Select
+Search and add the following (Ctrl+Space helps in the UI):
+Spring Web – For REST API
+Spring Data JPA – ORM for PostgreSQL
+Spring Security – Needed for JWT-based authentication
+Validation – For input validation (javax.validation)
+PostgreSQL Driver
+Lombok – To reduce boilerplate
+Spring Boot DevTools – For live reload
+Spring Configuration Processor – Optional, for config autocomplete in IDE
+
+Later, we will add manually:
+JWT library (e.g., io.jsonwebtoken:jjwt-api)
+Model Mapper or MapStruct for DTO mapping
+Testcontainers (for database integration testing)
+-- --- --- -
+Create entities (User, Product, Category, Order, etc.)
+Create repository interfaces
+Create DTOs and service interfaces
+Implement controllers (API layer)
+Set up JWT security layer
+Add global exception handling
+
+Add Stripe service (optional but can be done later)

@@ -1,0 +1,20 @@
+1.API (Controller layer) – package api/
+ -Exposes REST endpoints (@RestController).
+ -Translates HTTP ↔ DTOs.
+
+2.Service (Business layer) – package service/
+ -Encapsulates business rules, transactions, orchestration.
+
+3.Repository (Data access layer) – package repository/
+ -Talks to the database via Spring Data JPA.
+
+MVC mapping: In a SPA setup, the View lives in React (separate project). The backend holds the Model (entities/DTOs) and the Controller (REST). So:
+M= domain/ entities (+DTOs)
+V= React App
+C= api/ controllers
+
+This separation keeps the backend clean and testable, and the frontend free to evolve independently.
+
+
+
+
