@@ -1,7 +1,10 @@
 package com.eshop.api.api;
 
-import com.eshop.api.domain.Product;
+import com.eshop.api.dto.ProductRequest;
+import com.eshop.api.dto.ProductResponse;
 import com.eshop.api.service.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
+
     private final ProductService service;
 
     public ProductController(ProductService service) {
@@ -16,7 +20,13 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAll() {
+    public List<ProductResponse> getAll() {
         return service.getAll();
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponse create(@Validated @RequestBody ProductRequest request) {
+        return service.create(request);
     }
 }
