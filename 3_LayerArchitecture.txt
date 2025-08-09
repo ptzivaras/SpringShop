@@ -15,6 +15,11 @@ C= api/ controllers
 
 This separation keeps the backend clean and testable, and the frontend free to evolve independently.
 
+--What we got now?
+React app = the UI (replaces ASP.NET MVC with Razor).
+Spring Boot API = Controllers (API layer) + Services (business layer).
+Repositories + Entities = Data access layer.
+
 
 
 
