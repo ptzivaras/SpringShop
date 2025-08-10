@@ -3,6 +3,7 @@ package com.eshop.api.api;
 import com.eshop.api.dto.*;
 import com.eshop.api.service.ShoppingCartService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,13 @@ public class ShoppingCartController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("isAuthenticated()")
     public ShoppingCartResponse getCart(@PathVariable Long userId) {
         return service.getByUserId(userId);
     }
 
     @PostMapping("/user/{userId}/items")
+    @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     public ShoppingCartResponse addItem(
             @PathVariable Long userId,
@@ -31,6 +34,7 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping("/user/{userId}/items/{productId}")
+    @PreAuthorize("isAuthenticated()")
     public ShoppingCartResponse removeItem(
             @PathVariable Long userId,
             @PathVariable Long productId
