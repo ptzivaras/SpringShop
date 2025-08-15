@@ -1,14 +1,11 @@
-package com.eshop.api.api;
+package com.eshop.api.controller;
 
-import com.eshop.api.dto.ProductRequest;
-import com.eshop.api.dto.ProductResponse;
+import com.eshop.api.dto.product.*;
 import com.eshop.api.service.ProductService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -16,19 +13,37 @@ public class ProductController {
 
     private final ProductService service;
 
-    public ProductController(ProductService service) {
-        this.service = service;
-    }
+    public ProductController(ProductService service) { this.service = service; }
 
     @GetMapping
-    public List<ProductResponse> getAll() {
-        return service.getAll();
+    public Page<ProductResponse> search(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long categoryId,
+            Pageable pageable
+    ) {
+        return service.search(search, categoryId, pageable);
     }
 
-    @PostMapping
+    @GetMapping("/{id}")
+    public ProductResponse get(@PathVariable Long id) {
+        return service.get(id);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProductResponse create(@Validated @RequestBody ProductRequest request) {
-        return service.create(request);
+    @PostMapping
+    public ProductResponse create(@Valid @RequestBody ProductRequest req) {
+        return service.create(req);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ProductResponse update(@PathVariable Long id, @Valid @RequestBody ProductRequest req) {
+        return service.update(id, req);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }

@@ -1,18 +1,13 @@
-package com.eshop.api.dto;
+package com.eshop.api.dto.product;
 
-import lombok.*;
+import java.math.BigDecimal;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ProductResponse {
-
-    private Long id;
-    private String name;
-    private String description;
-    private Double price;
-    private Integer stockQuantity;
-    private Long categoryId;
-    private String categoryName;
-}
+public record ProductResponse(
+        Long id,
+        String name,
+        String description,
+        BigDecimal price,
+        int stock,
+        Long categoryId,
+        String categoryName
+) {}

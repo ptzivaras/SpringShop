@@ -1,13 +1,11 @@
-package com.eshop.api.api;
+package com.eshop.api.controller;
 
-import com.eshop.api.dto.CategoryRequest;
-import com.eshop.api.dto.CategoryResponse;
+import com.eshop.api.dto.category.*;
 import com.eshop.api.service.CategoryService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -15,19 +13,33 @@ public class CategoryController {
 
     private final CategoryService service;
 
-    public CategoryController(CategoryService service) {
-        this.service = service;
-    }
+    public CategoryController(CategoryService service) { this.service = service; }
 
     @GetMapping
-    public List<CategoryResponse> getAll() {
-        return service.getAll();
+    public Page<CategoryResponse> list(Pageable pageable) {
+        return service.list(pageable);
     }
 
-    @PostMapping
+    @GetMapping("/{id}")
+    public CategoryResponse get(@PathVariable Long id) {
+        return service.get(id);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CategoryResponse create(@RequestBody CategoryRequest request) {
-        return service.create(request);
+    @PostMapping
+    public CategoryResponse create(@Valid @RequestBody CategoryRequest req) {
+        return service.create(req);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody CategoryRequest req) {
+        return service.update(id, req);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }

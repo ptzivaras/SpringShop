@@ -1,66 +1,84 @@
 package com.eshop.api.service.impl;
 
-import com.eshop.api.domain.Category;
-import com.eshop.api.domain.Product;
-import com.eshop.api.dto.ProductRequest;
-import com.eshop.api.dto.ProductResponse;
-import com.eshop.api.repository.CategoryRepository;
-import com.eshop.api.repository.ProductRepository;
+import com.eshop.api.domain.*;
+import com.eshop.api.dto.product.*;
+import com.eshop.api.exception.NotFoundException;
+import com.eshop.api.repository.*;
 import com.eshop.api.service.ProductService;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
+@Transactional
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepo;
     private final CategoryRepository categoryRepo;
 
-    public ProductServiceImpl(ProductRepository productRepo,
-                              CategoryRepository categoryRepo) {
+    public ProductServiceImpl(ProductRepository productRepo, CategoryRepository categoryRepo) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
     }
 
     @Override
-    public List<ProductResponse> getAll() {
-        return productRepo.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> search(String search, Long categoryId, Pageable pageable) {
+        return productRepo.search(blankToNull(search), categoryId, pageable)
+                .map(this::toResponse);
     }
 
     @Override
-    @Transactional
-    public ProductResponse create(ProductRequest req) {
-        Product product = Product.builder()
-                .name(req.getName())
-                .description(req.getDescription())
-                .price(req.getPrice())
-                .stockQuantity(req.getStockQuantity())
+    @Transactional(readOnly = true)
+    public ProductResponse get(Long id) {
+        Product p = productRepo.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
+        return toResponse(p);
+    }
+
+    @Override
+    public ProductResponse create(ProductRequest request) {
+        Category cat = categoryRepo.findById(request.categoryId())
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+        Product p = Product.builder()
+                .name(request.name())
+                .description(request.description())
+                .price(request.price())
+                .stock(request.stock())
+                .category(cat)
                 .build();
+        p = productRepo.save(p);
+        return toResponse(p);
+    }
 
-        if (req.getCategoryId() != null) {
-            Category cat = categoryRepo.findById(req.getCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
-            product.setCategory(cat);
-        }
+    @Override
+    public ProductResponse update(Long id, ProductRequest request) {
+        Product p = productRepo.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
+        Category cat = categoryRepo.findById(request.categoryId())
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+        p.setName(request.name());
+        p.setDescription(request.description());
+        p.setPrice(request.price());
+        p.setStock(request.stock());
+        p.setCategory(cat);
+        return toResponse(p);
+    }
 
-        Product saved = productRepo.save(product);
-        return toResponse(saved);
+    @Override
+    public void delete(Long id) {
+        if (!productRepo.existsById(id)) throw new NotFoundException("Product not found");
+        productRepo.deleteById(id);
     }
 
     private ProductResponse toResponse(Product p) {
-        return ProductResponse.builder()
-                .id(p.getId())
-                .name(p.getName())
-                .description(p.getDescription())
-                .price(p.getPrice())
-                .stockQuantity(p.getStockQuantity())
-                .categoryId(p.getCategory() != null ? p.getCategory().getId() : null)
-                .categoryName(p.getCategory() != null ? p.getCategory().getName() : null)
-                .build();
+        return new ProductResponse(
+                p.getId(), p.getName(), p.getDescription(),
+                p.getPrice(), p.getStock(),
+                p.getCategory().getId(),
+                p.getCategory().getName()
+        );
+    }
+
+    private String blankToNull(String s) {
+        return (s == null || s.isBlank()) ? null : s;
     }
 }

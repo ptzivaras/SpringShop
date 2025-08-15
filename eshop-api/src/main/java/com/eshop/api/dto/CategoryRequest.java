@@ -1,16 +1,8 @@
-package com.eshop.api.dto;
-
-import lombok.*;
+package com.eshop.api.dto.category;
 
 import jakarta.validation.constraints.NotBlank;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class CategoryRequest {
-    @NotBlank
-    private String name;
-
-    private String description;
-}
+public record CategoryRequest(
+        @NotBlank String name,
+        String description
+) {}

@@ -1,28 +1,12 @@
-package com.eshop.api.dto;
-
-import lombok.*;
+package com.eshop.api.dto.product;
 
 import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ProductRequest {
-
-    @NotBlank
-    private String name;
-
-    private String description;
-
-    @NotNull
-    @PositiveOrZero
-    private Double price;
-
-    @NotNull
-    @Min(0)
-    private Integer stockQuantity;
-
-    // TODO: is it needed for link or not?
-    private Long categoryId;
-}
+public record ProductRequest(
+        @NotBlank String name,
+        String description,
+        @NotNull @DecimalMin("0.0") BigDecimal price,
+        @Min(0) int stock,
+        @NotNull Long categoryId
+) {}

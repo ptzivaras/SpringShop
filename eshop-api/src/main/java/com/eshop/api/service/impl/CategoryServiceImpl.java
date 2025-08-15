@@ -1,48 +1,57 @@
 package com.eshop.api.service.impl;
 
 import com.eshop.api.domain.Category;
-import com.eshop.api.dto.CategoryRequest;
-import com.eshop.api.dto.CategoryResponse;
+import com.eshop.api.dto.category.*;
+import com.eshop.api.exception.NotFoundException;
 import com.eshop.api.repository.CategoryRepository;
 import com.eshop.api.service.CategoryService;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository repo;
 
-    public CategoryServiceImpl(CategoryRepository repo) {
-        this.repo = repo;
+    public CategoryServiceImpl(CategoryRepository repo) { this.repo = repo; }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CategoryResponse> list(Pageable pageable) {
+        return repo.findAll(pageable)
+                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getDescription()));
     }
 
     @Override
-    public List<CategoryResponse> getAll() {
-        return repo.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public CategoryResponse get(Long id) {
+        Category c = repo.findById(id).orElseThrow(() -> new NotFoundException("Category not found"));
+        return new CategoryResponse(c.getId(), c.getName(), c.getDescription());
     }
 
     @Override
-    @Transactional
-    public CategoryResponse create(CategoryRequest req) {
-        Category cat = Category.builder()
-                .name(req.getName())
-                .description(req.getDescription())
+    public CategoryResponse create(CategoryRequest request) {
+        Category c = Category.builder()
+                .name(request.name())
+                .description(request.description())
                 .build();
-        Category saved = repo.save(cat);
-        return toResponse(saved);
+        c = repo.save(c);
+        return new CategoryResponse(c.getId(), c.getName(), c.getDescription());
     }
 
-    private CategoryResponse toResponse(Category c) {
-        return CategoryResponse.builder()
-                .id(c.getId())
-                .name(c.getName())
-                .description(c.getDescription())
-                .build();
+    @Override
+    public CategoryResponse update(Long id, CategoryRequest request) {
+        Category c = repo.findById(id).orElseThrow(() -> new NotFoundException("Category not found"));
+        c.setName(request.name());
+        c.setDescription(request.description());
+        return new CategoryResponse(c.getId(), c.getName(), c.getDescription());
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!repo.existsById(id)) throw new NotFoundException("Category not found");
+        repo.deleteById(id);
     }
 }
