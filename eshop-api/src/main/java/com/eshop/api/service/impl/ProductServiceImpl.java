@@ -1,7 +1,7 @@
 package com.eshop.api.service.impl;
 
 import com.eshop.api.domain.*;
-import com.eshop.api.dto.product.*;
+import com.eshop.api.dto.*;
 import com.eshop.api.exception.NotFoundException;
 import com.eshop.api.repository.*;
 import com.eshop.api.service.ProductService;
@@ -23,20 +23,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponse> search(String search, Long categoryId, Pageable pageable) {
+    public Page<com.eshop.api.dto.product.ProductResponse> search(String search, Long categoryId, Pageable pageable) {
         return productRepo.search(blankToNull(search), categoryId, pageable)
                 .map(this::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ProductResponse get(Long id) {
+    public com.eshop.api.dto.product.ProductResponse get(Long id) {
         Product p = productRepo.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
         return toResponse(p);
     }
 
     @Override
-    public ProductResponse create(ProductRequest request) {
+    public com.eshop.api.dto.product.ProductResponse create(com.eshop.api.dto.product.ProductRequest request) {
         Category cat = categoryRepo.findById(request.categoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         Product p = Product.builder()
@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse update(Long id, ProductRequest request) {
+    public com.eshop.api.dto.product.ProductResponse update(Long id, com.eshop.api.dto.product.ProductRequest request) {
         Product p = productRepo.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
         Category cat = categoryRepo.findById(request.categoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
@@ -69,8 +69,8 @@ public class ProductServiceImpl implements ProductService {
         productRepo.deleteById(id);
     }
 
-    private ProductResponse toResponse(Product p) {
-        return new ProductResponse(
+    private com.eshop.api.dto.product.ProductResponse toResponse(Product p) {
+        return new com.eshop.api.dto.product.ProductResponse(
                 p.getId(), p.getName(), p.getDescription(),
                 p.getPrice(), p.getStock(),
                 p.getCategory().getId(),

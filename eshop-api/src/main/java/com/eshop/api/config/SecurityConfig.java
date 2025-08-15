@@ -60,6 +60,18 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable());
         return http.build();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var cfg = new org.springframework.web.cors.CorsConfiguration();
+        cfg.setAllowedOrigins(java.util.List.of("http://localhost:5173"));
+        cfg.setAllowedMethods(java.util.List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        cfg.setAllowedHeaders(java.util.List.of("Authorization","Content-Type"));
+        cfg.setAllowCredentials(true);
+        var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg);
+        return source;
+    }
 }
 
 

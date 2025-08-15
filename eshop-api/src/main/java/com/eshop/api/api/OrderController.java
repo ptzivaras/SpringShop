@@ -32,4 +32,11 @@ public class OrderController {
     public OrderResponse createMyOrder(@Validated @RequestBody OrderCreateRequest request) {
         return service.createForCurrentUser(request);
     }
+
+    @PostMapping("/me/checkout")
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrderResponse checkoutMyCart() {
+        return service.createFromCurrentUserCart();
+    }
 }

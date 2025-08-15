@@ -16,7 +16,7 @@ public class CategoryController {
     public CategoryController(CategoryService service) { this.service = service; }
 
     @GetMapping
-    public Page<CategoryResponse> list(Pageable pageable) {
+    public Page<com.eshop.api.dto.category.CategoryResponse> list(Pageable pageable) {
         return service.list(pageable);
     }
 

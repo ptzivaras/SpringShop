@@ -1,11 +1,9 @@
-package com.eshop.api.api;
+package com.eshop.api.controller;
 
-import com.eshop.api.dto.CartItemRequest;
+import com.eshop.api.dto.CartAddItemRequest;
 import com.eshop.api.dto.ShoppingCartResponse;
 import com.eshop.api.service.ShoppingCartService;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,22 +16,25 @@ public class ShoppingCartController {
         this.service = service;
     }
 
-    @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
-    public ShoppingCartResponse getMyCart() {
-        return service.getMyCart();
+    @GetMapping
+    public ShoppingCartResponse get() { return service.getMyCart(); }
+
+    @PostMapping("/items")
+    public ShoppingCartResponse add(@Valid @RequestBody CartAddItemRequest req) {
+        return service.addItem(req);
     }
 
-    @PostMapping("/me/items")
-    @PreAuthorize("isAuthenticated()")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ShoppingCartResponse addItem(@Validated @RequestBody CartItemRequest request) {
-        return service.addItemToMyCart(request);
+    @PatchMapping("/items/{productId}")
+    public ShoppingCartResponse update(@PathVariable Long productId,
+                                       @RequestParam int quantity) {
+        return service.updateItem(productId, quantity);
     }
 
-    @DeleteMapping("/me/items/{productId}")
-    @PreAuthorize("isAuthenticated()")
-    public ShoppingCartResponse removeItem(@PathVariable Long productId) {
-        return service.removeItemFromMyCart(productId);
+    @DeleteMapping("/items/{productId}")
+    public ShoppingCartResponse remove(@PathVariable Long productId) {
+        return service.removeItem(productId);
     }
+
+    @DeleteMapping
+    public ShoppingCartResponse clear() { return service.clear(); }
 }

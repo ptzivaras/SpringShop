@@ -16,7 +16,7 @@ public class ProductController {
     public ProductController(ProductService service) { this.service = service; }
 
     @GetMapping
-    public Page<ProductResponse> search(
+    public Page<com.eshop.api.dto.product.ProductResponse> search(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Long categoryId,
             Pageable pageable
