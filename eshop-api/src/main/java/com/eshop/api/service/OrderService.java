@@ -1,11 +1,10 @@
 package com.eshop.api.service;
 
-import com.eshop.api.dto.OrderRequest;
-import com.eshop.api.dto.OrderResponse;
+import com.eshop.api.dto.*;
 
 import java.util.List;
 
 public interface OrderService {
-    List<OrderResponse> getAll();
-    OrderResponse create(OrderRequest request);
+    List<OrderResponse> getMine();
+    OrderResponse createForCurrentUser(OrderCreateRequest request);
 }

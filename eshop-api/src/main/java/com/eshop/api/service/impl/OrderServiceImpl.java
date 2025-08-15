@@ -4,7 +4,9 @@ import com.eshop.api.domain.*;
 import com.eshop.api.dto.*;
 import com.eshop.api.repository.OrderRepository;
 import com.eshop.api.repository.ProductRepository;
+import com.eshop.api.repository.UserRepository;
 import com.eshop.api.service.OrderService;
+import com.eshop.api.util.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,26 +19,36 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepo;
     private final ProductRepository productRepo;
+    private final UserRepository userRepo;
+    private final SecurityUtils securityUtils;
 
     public OrderServiceImpl(OrderRepository orderRepo,
-                            ProductRepository productRepo) {
+                            ProductRepository productRepo,
+                            UserRepository userRepo,
+                            SecurityUtils securityUtils) {
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
+        this.userRepo = userRepo;
+        this.securityUtils = securityUtils;
     }
 
     @Override
-    public List<OrderResponse> getAll() {
-        return orderRepo.findAll().stream()
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getMine() {
+        Long userId = currentUserId();
+        return orderRepo.findAll().stream() // consider add findByUserId(userId)
+                .filter(o -> o.getUserId().equals(userId))
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public OrderResponse create(OrderRequest req) {
-        // Build Order and OrderItems
+    public OrderResponse createForCurrentUser(OrderCreateRequest req) {
+        Long userId = currentUserId();
+
         Order order = Order.builder()
-                .userId(req.getUserId())
+                .userId(userId)
                 .orderDate(Instant.now())
                 .build();
 
@@ -44,12 +56,8 @@ public class OrderServiceImpl implements OrderService {
                 .map(itemReq -> {
                     Product product = productRepo.findById(itemReq.getProductId())
                             .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
-
-                    // Deduct stock
                     int newStock = product.getStockQuantity() - itemReq.getQuantity();
-                    if (newStock < 0) {
-                        throw new IllegalArgumentException("Out of stock: " + product.getName());
-                    }
+                    if (newStock < 0) throw new IllegalArgumentException("Out of stock: " + product.getName());
                     product.setStockQuantity(newStock);
                     productRepo.save(product);
 
@@ -62,11 +70,7 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .collect(Collectors.toList());
 
-        // Total price
-        double total = items.stream()
-                .mapToDouble(i -> i.getUnitPrice() * i.getQuantity())
-                .sum();
-
+        double total = items.stream().mapToDouble(i -> i.getUnitPrice() * i.getQuantity()).sum();
         order.setItems(items);
         order.setTotalPrice(total);
 
@@ -74,8 +78,15 @@ public class OrderServiceImpl implements OrderService {
         return toResponse(saved);
     }
 
+    private Long currentUserId() {
+        String username = securityUtils.currentUsername();
+        return userRepo.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"))
+                .getId();
+    }
+
     private OrderResponse toResponse(Order o) {
-        List<OrderItemResponse> itemRes = o.getItems().stream()
+        var itemRes = o.getItems().stream()
                 .map(i -> OrderItemResponse.builder()
                         .productId(i.getProduct().getId())
                         .productName(i.getProduct().getName())

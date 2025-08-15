@@ -2,9 +2,11 @@ package com.eshop.api.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.io.Decoders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -18,8 +20,26 @@ public class JwtUtil {
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration-ms}") long expirationMs
     ) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        // Prefer Base64 secrets. If not Base64, fall back to raw UTF-8 bytes.
+        byte[] keyBytes;
+        try {
+            keyBytes = Decoders.BASE64.decode(secret);
+        } catch (IllegalArgumentException ignore) {
+            keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        }
+
+        // Enforce >= 256 bits for HS256
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException(
+                    "jwt.secret must be at least 256 bits (32 bytes). " +
+                            "Provide a Base64-encoded 32-byte value."
+            );
+        }
+
+        this.key = Keys.hmacShaKeyFor(keyBytes);
         this.expirationMs = expirationMs;
+        //this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        //this.expirationMs = expirationMs;
     }
 
     /** Generate a JWT containing username as subject and expiry date */
@@ -47,10 +67,12 @@ public class JwtUtil {
     /** Validate token (checks signature and expiration) */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
+            //Jwts.parserBuilder()
+            //        .setSigningKey(key)
+             //       .build()
+            //        .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             // log or handle invalid/expired token

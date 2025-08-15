@@ -1,6 +1,6 @@
 package com.eshop.api.api;
 
-import com.eshop.api.dto.OrderRequest;
+import com.eshop.api.dto.OrderCreateRequest;
 import com.eshop.api.dto.OrderResponse;
 import com.eshop.api.service.OrderService;
 import org.springframework.http.HttpStatus;
@@ -20,16 +20,16 @@ public class OrderController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public List<OrderResponse> getAll() {
-        return service.getAll();
+    public List<OrderResponse> myOrders() {
+        return service.getMine();
     }
 
-    @PostMapping
+    @PostMapping("/me")
     @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderResponse create(@Validated @RequestBody OrderRequest request) {
-        return service.create(request);
+    public OrderResponse createMyOrder(@Validated @RequestBody OrderCreateRequest request) {
+        return service.createForCurrentUser(request);
     }
 }

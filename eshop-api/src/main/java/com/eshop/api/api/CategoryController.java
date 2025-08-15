@@ -25,7 +25,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    @PreAuthorize
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryResponse create(@RequestBody CategoryRequest request) {
         return service.create(request);
