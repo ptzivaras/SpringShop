@@ -1,6 +1,7 @@
 package com.eshop.api.service;
 
-import com.eshop.api.dto.category.*;
+import com.eshop.api.dto.CategoryResponse;
+import com.eshop.api.dto.CategoryRequest;
 import org.springframework.data.domain.*;
 
 public interface CategoryService {

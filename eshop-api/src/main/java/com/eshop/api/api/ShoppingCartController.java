@@ -1,4 +1,5 @@
-package com.eshop.api.controller;
+//package com.eshop.api.controller;
+package com.eshop.api.api;
 
 import com.eshop.api.dto.CartAddItemRequest;
 import com.eshop.api.dto.ShoppingCartResponse;

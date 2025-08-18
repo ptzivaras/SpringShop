@@ -1,7 +1,8 @@
 package com.eshop.api.service.impl;
 
 import com.eshop.api.domain.Category;
-import com.eshop.api.dto.category.*;
+import com.eshop.api.dto.CategoryRequest;
+import com.eshop.api.dto.CategoryResponse;
 import com.eshop.api.exception.NotFoundException;
 import com.eshop.api.repository.CategoryRepository;
 import com.eshop.api.service.CategoryService;

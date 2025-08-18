@@ -1,13 +1,23 @@
 package com.eshop.api.service.impl;
 
-import com.eshop.api.domain.*;
-import com.eshop.api.dto.*;
+import com.eshop.api.domain.Category;
+import com.eshop.api.domain.Product;
+import com.eshop.api.dto.ProductResponse;
+import com.eshop.api.dto.ProductRequest;
 import com.eshop.api.exception.NotFoundException;
-import com.eshop.api.repository.*;
+import com.eshop.api.repository.CategoryRepository;
+import com.eshop.api.repository.ProductRepository;
 import com.eshop.api.service.ProductService;
-import org.springframework.data.domain.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -16,66 +26,124 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
     private final CategoryRepository categoryRepo;
 
+    @Value("${app.upload-dir:uploads}")
+    private String uploadDir;
+
     public ProductServiceImpl(ProductRepository productRepo, CategoryRepository categoryRepo) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
     }
 
+    // ----------------- QUERY -----------------
     @Override
     @Transactional(readOnly = true)
-    public Page<com.eshop.api.dto.product.ProductResponse> search(String search, Long categoryId, Pageable pageable) {
+    public Page<ProductResponse> search(String search, Long categoryId, Pageable pageable) {
         return productRepo.search(blankToNull(search), categoryId, pageable)
                 .map(this::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public com.eshop.api.dto.product.ProductResponse get(Long id) {
-        Product p = productRepo.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
+    public ProductResponse get(Long id) {
+        Product p = productRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
         return toResponse(p);
     }
 
+    // ----------------- MUTATIONS -----------------
     @Override
-    public com.eshop.api.dto.product.ProductResponse create(com.eshop.api.dto.product.ProductRequest request) {
-        Category cat = categoryRepo.findById(request.categoryId())
+    public ProductResponse create(ProductRequest request) {
+        Category cat = categoryRepo.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
+
         Product p = Product.builder()
-                .name(request.name())
-                .description(request.description())
-                .price(request.price())
-                .stock(request.stock())
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .stock(request.getStock())
                 .category(cat)
                 .build();
+
         p = productRepo.save(p);
         return toResponse(p);
     }
 
     @Override
-    public com.eshop.api.dto.product.ProductResponse update(Long id, com.eshop.api.dto.product.ProductRequest request) {
-        Product p = productRepo.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
-        Category cat = categoryRepo.findById(request.categoryId())
+    public ProductResponse update(Long id, ProductRequest request) {
+        Product p = productRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+
+        Category cat = categoryRepo.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        p.setName(request.name());
-        p.setDescription(request.description());
-        p.setPrice(request.price());
-        p.setStock(request.stock());
+
+        p.setName(request.getName());
+        p.setDescription(request.getDescription());
+        p.setPrice(request.getPrice());
+        p.setStock(request.getStock());
         p.setCategory(cat);
+
+        p = productRepo.save(p);
         return toResponse(p);
     }
 
     @Override
     public void delete(Long id) {
-        if (!productRepo.existsById(id)) throw new NotFoundException("Product not found");
+        if (!productRepo.existsById(id)) {
+            throw new NotFoundException("Product not found");
+        }
         productRepo.deleteById(id);
     }
 
-    private com.eshop.api.dto.product.ProductResponse toResponse(Product p) {
-        return new com.eshop.api.dto.product.ProductResponse(
-                p.getId(), p.getName(), p.getDescription(),
-                p.getPrice(), p.getStock(),
-                p.getCategory().getId(),
-                p.getCategory().getName()
-        );
+    // ----------------- IMAGE UPLOAD -----------------
+    @Override
+    public ProductResponse uploadImage(Long id, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Empty file");
+        }
+        String ct = file.getContentType();
+        if (ct == null || !ct.startsWith("image/")) {
+            throw new IllegalArgumentException("Only image/* allowed");
+        }
+
+        Product p = productRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+
+        try {
+            Files.createDirectories(Path.of(uploadDir));
+
+            String ext = switch (ct) {
+                case "image/png"  -> ".png";
+                case "image/jpeg" -> ".jpg";
+                case "image/webp" -> ".webp";
+                default -> ".img";
+            };
+
+            String filename = "product-" + id + "-" + UUID.randomUUID() + ext;
+            Path dest = Path.of(uploadDir, filename);
+            Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
+
+            // προβάλλουμε με /uploads/**
+            p.setImageUrl("/uploads/" + filename);
+            p = productRepo.save(p);
+
+            return toResponse(p);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file", e);
+        }
+    }
+
+    // ----------------- MAPPERS -----------------
+    private ProductResponse toResponse(Product p) {
+        return ProductResponse.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .description(p.getDescription())
+                .price(p.getPrice())
+                .stock(p.getStock())
+                .categoryId(p.getCategory().getId())
+                .categoryName(p.getCategory().getName())
+                .imageUrl(p.getImageUrl())
+                .build();
     }
 
     private String blankToNull(String s) {

@@ -21,6 +21,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder; // <-- inject
+    //private final SecurityHeadersFilter securityHeadersFilter;
 
     public SecurityConfig(CustomUserDetailsService uds, JwtUtil ju, PasswordEncoder pe) {
         this.userDetailsService = uds;
@@ -28,14 +29,30 @@ public class SecurityConfig {
         this.passwordEncoder = pe;
     }
 
+
+/*
+    public SecurityConfig(CustomUserDetailsService uds, JwtUtil ju,
+                          PasswordEncoder pe, SecurityHeadersFilter shf) {
+        this.userDetailsService = uds;
+        this.jwtUtil = ju;
+        this.passwordEncoder = pe;
+        this.securityHeadersFilter = shf;
+    }*/
+
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        return http
+       /* return http
                 .getSharedObject(AuthenticationManagerBuilder.class)
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder) // <-- use injected bean
                 .and()
-                .build();
+                .build();*/
+        AuthenticationManagerBuilder authBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authBuilder
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder);
+        return authBuilder.build();
     }
 
     @Bean
@@ -43,8 +60,16 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(jwtUtil, userDetailsService);
     }
 
+    //Το filter ως ξεχωριστό bean (όχι constructor)
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    public SecurityHeadersFilter securityHeadersFilter() {
+        return new SecurityHeadersFilter();
+    }
+    //Ζήτησέ το ως method parameter
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           CorsConfigurationSource corsConfigurationSource,
+                                           SecurityHeadersFilter securityHeadersFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(c -> c.configurationSource(corsConfigurationSource))
@@ -53,14 +78,16 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**", "/api/auth/**",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/products/**", "/api/categories/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()   // αν σερβίρεις images από το filesystem
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(securityHeadersFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(httpBasic -> httpBasic.disable());
+
         return http.build();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var cfg = new org.springframework.web.cors.CorsConfiguration();
@@ -72,6 +99,11 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
+
+    //@Bean
+    //public SecurityHeadersFilter securityHeadersFilter() {
+     //   return new SecurityHeadersFilter();
+    //}
 }
 
 

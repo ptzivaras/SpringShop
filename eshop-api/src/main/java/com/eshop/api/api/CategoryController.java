@@ -1,11 +1,14 @@
-package com.eshop.api.controller;
 
-import com.eshop.api.dto.category.*;
+package com.eshop.api.api;
+
+import com.eshop.api.dto.CategoryResponse;
+import com.eshop.api.dto.CategoryRequest;
 import com.eshop.api.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/categories")
@@ -16,7 +19,7 @@ public class CategoryController {
     public CategoryController(CategoryService service) { this.service = service; }
 
     @GetMapping
-    public Page<com.eshop.api.dto.category.CategoryResponse> list(Pageable pageable) {
+    public Page<com.eshop.api.dto.CategoryResponse> list(Pageable pageable) {
         return service.list(pageable);
     }
 

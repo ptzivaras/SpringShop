@@ -44,4 +44,7 @@ public class Product {
     void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @Column(length = 500)
+    private String imageUrl;
 }
