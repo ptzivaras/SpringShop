@@ -17,6 +17,7 @@ import com.eshop.api.util.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,41 +54,51 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse createForCurrentUser(OrderCreateRequest req) {
+    public OrderResponse checkoutMyCart() {
         Long userId = currentUserId();
+
+        ShoppingCart cart = cartRepo.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Το καλάθι δεν υπάρχει"));
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Το καλάθι είναι άδειο");
+        }
 
         Order order = Order.builder()
                 .userId(userId)
                 .orderDate(Instant.now())
+                .items(new ArrayList<>())
+                .totalPrice(0.0)
                 .build();
 
-        List<OrderItem> items = req.getItems().stream()
-                .map(itemReq -> {
-                    Product product = productRepo.findById(itemReq.getProductId())
-                            .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+        BigDecimal total = BigDecimal.ZERO;
 
-                    int newStock = product.getStock() - itemReq.getQuantity();
-                    if (newStock < 0) {
-                        throw new IllegalArgumentException("Out of stock: " + product.getName());
-                    }
-                    product.setStock(newStock);
-                    productRepo.save(product);
+        for (CartItem ci : cart.getItems()) {
+            Product product = ci.getProduct();
+            int qty = ci.getQuantity();
 
-                    return OrderItem.builder()
-                            .order(order)
-                            .product(product)
-                            .quantity(itemReq.getQuantity())
-                            .unitPrice(product.getPrice().doubleValue())
-                            .build();
-                })
-                .toList();
+            if (product.getStock() < qty) {
+                throw new IllegalArgumentException("Μη επαρκές stock για: " + product.getName());
+            }
+            product.setStock(product.getStock() - qty);   // ενημέρωση στοκ
+            productRepo.save(product);
 
-        double total = items.stream()
-                .mapToDouble(i -> i.getUnitPrice() * i.getQuantity())
-                .sum();
+            var oi = OrderItem.builder()
+                    .order(order)
+                    .product(product)
+                    .quantity(qty)
+                    .unitPrice(product.getPrice().doubleValue()) // domain OrderItem έχει Double
+                    .build();
 
-        order.setItems(items);
-        order.setTotalPrice(total);
+            order.getItems().add(oi);
+
+            total = total.add(product.getPrice().multiply(BigDecimal.valueOf(qty)));
+        }
+
+        order.setTotalPrice(total.doubleValue());
+
+        // άδειασμα καλαθιού
+        cart.getItems().clear();
+        cartRepo.save(cart);
 
         Order saved = orderRepo.save(order);
         return toResponse(saved);

@@ -9,4 +9,5 @@ public interface OrderService {
     OrderResponse createForCurrentUser(OrderCreateRequest request);
     // ftiaxnei order apo to kalathi tou logged iin user
     OrderResponse createFromCurrentUserCart();
+    OrderResponse checkoutMyCart();
 }

@@ -4,6 +4,7 @@ import com.eshop.api.dto.*;
 import com.eshop.api.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,7 @@ public class ProductController {
         return service.search(search, categoryId, pageable);
     }
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/image")
+    @PostMapping(value="/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProductResponse uploadImage(@PathVariable Long id,
                                        @RequestParam("file") MultipartFile file) {
         return service.uploadImage(id, file);
