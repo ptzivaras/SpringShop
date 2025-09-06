@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useGetProductsQuery } from '../api/productsApi.js'
+import { useGetProductsQuery, useGetProductByIdQuery } from '../api/productsApi.js'
 import { useGetCategoriesQuery } from '../api/categoriesApi.js'
+import { useGetReviewsByProductQuery } from '../api/reviewsApi.js'
 import { addToCart } from '../features/cart/cartSlice.js'
 // ✅ extra imports for CartPage actions (ΔΕΝ σβήνω τα δικά σου σχόλια παρακάτω)
 import {
@@ -182,7 +183,10 @@ function HomePage() {
         }}>
           {products.map(p => (
             <li key={p.id} style={{ border:'1px solid #eee', borderRadius:12, padding:12 }}>
-              <div style={{ fontWeight: 600, marginBottom:4 }}>{p.name}</div>
+              {/* Link σε product page */}
+              <div style={{ fontWeight: 600, marginBottom:4 }}>
+                <Link to={`/product/${p.id}`}>{p.name}</Link>
+              </div>
               <div style={{ color:'#666', fontSize:14, minHeight:38 }}>{p.description}</div>
               <div style={{ marginTop:8, fontWeight:600 }}>${p.price}</div>
               <div style={{ fontSize:12, color:'#666' }}>Stock: {p.stockQty}</div>
@@ -201,7 +205,48 @@ function HomePage() {
   )
 }
 
-function ProductPage()  { return <h1 style={{padding:20}}>Product Page</h1> }
+function ProductPage()  {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const { data: product, isLoading, isError } = useGetProductByIdQuery(id)
+  const { data: reviews = [], isLoading: rLoading } = useGetReviewsByProductQuery(id)
+
+  if (isLoading) return <div style={{padding:20}}>Loading product…</div>
+  if (isError || !product) return <div style={{padding:20}}>Product not found</div>
+
+  return (
+    <div style={{ padding:20 }}>
+      <button onClick={() => navigate(-1)} style={{ marginBottom:12 }}>← Back</button>
+      <h1 style={{ marginBottom:4 }}>{product.name}</h1>
+      <div style={{ color:'#666', marginBottom:8 }}>{product.description}</div>
+      <div style={{ fontWeight:600, marginBottom:8 }}>${product.price}</div>
+      <div style={{ fontSize:12, color:'#666', marginBottom:12 }}>Stock: {product.stockQty}</div>
+      <button
+        onClick={() => dispatch(addToCart({ productId: product.id, name: product.name, price: product.price }))}
+        style={{ padding:'6px 10px', border:'1px solid #ddd', borderRadius:6, cursor:'pointer', marginBottom:16 }}
+      >
+        Add to Cart
+      </button>
+
+      <h2 style={{ marginTop:8, marginBottom:8 }}>Reviews</h2>
+      {rLoading && <div>Loading reviews…</div>}
+      {!rLoading && reviews.length === 0 && <div>No reviews yet.</div>}
+      {!rLoading && reviews.length > 0 && (
+        <ul style={{ listStyle:'none', padding:0 }}>
+          {reviews.map(rv => (
+            <li key={rv.id} style={{ borderBottom:'1px solid #eee', padding:'8px 0' }}>
+              <div style={{ fontWeight:600 }}>{rv.userName} ★ {rv.rating}/5</div>
+              <div style={{ color:'#444' }}>{rv.comment}</div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 // function CartPage()     { return <h1 style={{padding:20}}>Cart Page</h1> }
 function CheckoutPage() { return <h1 style={{padding:20}}>Checkout Page</h1> }
 function AdminPage()    { return <h1 style={{padding:20}}>Admin Page</h1> }
