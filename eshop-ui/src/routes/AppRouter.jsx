@@ -4,7 +4,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useGetProductsQuery } from '../api/productsApi.js'
 import { useGetCategoriesQuery } from '../api/categoriesApi.js'
 import { addToCart } from '../features/cart/cartSlice.js'
-
+// ✅ extra imports for CartPage actions (ΔΕΝ σβήνω τα δικά σου σχόλια παρακάτω)
+import {
+  removeFromCart,
+  increaseQuantity,
+  decreaseQuantity,
+  clearCart
+} from '../features/cart/cartSlice.js'
 
 function Nav() {
   const cartCount = useSelector(state =>
@@ -68,7 +74,6 @@ function CartPage() {
     </div>
   )
 }
-
 
 function HomePage() {
   const dispatch = useDispatch()
@@ -181,6 +186,13 @@ function HomePage() {
               <div style={{ color:'#666', fontSize:14, minHeight:38 }}>{p.description}</div>
               <div style={{ marginTop:8, fontWeight:600 }}>${p.price}</div>
               <div style={{ fontSize:12, color:'#666' }}>Stock: {p.stockQty}</div>
+              {/* ✅ κουμπί προσθήκης στο καλάθι */}
+              <button
+                onClick={() => dispatch(addToCart({ productId: p.id, name: p.name, price: p.price }))}
+                style={{ marginTop:8, padding:'6px 10px', border:'1px solid #ddd', borderRadius:6, cursor:'pointer' }}
+              >
+                Add to Cart
+              </button>
             </li>
           ))}
         </ul>
@@ -190,7 +202,7 @@ function HomePage() {
 }
 
 function ProductPage()  { return <h1 style={{padding:20}}>Product Page</h1> }
-function CartPage()     { return <h1 style={{padding:20}}>Cart Page</h1> }
+// function CartPage()     { return <h1 style={{padding:20}}>Cart Page</h1> }
 function CheckoutPage() { return <h1 style={{padding:20}}>Checkout Page</h1> }
 function AdminPage()    { return <h1 style={{padding:20}}>Admin Page</h1> }
 function NotFound()     { return <h1 style={{padding:20}}>Not Found</h1> }
@@ -198,14 +210,15 @@ function NotFound()     { return <h1 style={{padding:20}}>Not Found</h1> }
 export default function AppRouter() {
   return (
     <BrowserRouter>
-    <Nav /> 
+      <Nav /> 
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/product/:id" element={<h1>Product Page</h1>} />
-        <Route path="/cart" element={<h1>Cart Page</h1>} />
-        <Route path="/checkout" element={<h1>Checkout Page</h1>} />
-        <Route path="/admin" element={<h1>Admin Page</h1>} />
-        <Route path="*" element={<h1 style={{padding:20}}>Not Found</h1>} />
+        <Route path="/product/:id" element={<ProductPage />} />
+        {/* ✅ κάνουμε render το κανονικό CartPage component */}
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )
