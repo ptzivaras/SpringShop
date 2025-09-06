@@ -19,6 +19,10 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Toaster, toast } from 'react-hot-toast'
 
+// ✅ Orders API + slice
+import { useCreateOrderMutation } from '../api/ordersApi.js'
+import { setLastOrder } from '../features/orders/ordersSlice.js'
+
 function Nav() {
   const cartCount = useSelector(state =>
     state.cart.items.reduce((sum, i) => sum + i.quantity, 0)
@@ -285,6 +289,7 @@ function CheckoutPage() {
   const items = useSelector(state => state.cart.items)
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0)
   const dispatch = useDispatch()
+  const [createOrder] = useCreateOrderMutation() // ✅ RTK Query mutation
 
   const {
     register,
@@ -306,9 +311,22 @@ function CheckoutPage() {
   const onSubmit = async (data) => {
     // mock “order submit”
     // εδώ αργότερα μπορούμε να POST στο /orders & /orderItems
-    toast.success('Order placed successfully!')
-    dispatch(clearCart())
-    reset()
+    try {
+      const orderPayload = {
+        ...data,
+        items,
+        total,
+        createdAt: new Date().toISOString()
+      }
+      const res = await createOrder(orderPayload).unwrap()
+      // αποθήκευση lastOrder στο redux
+      dispatch(setLastOrder(res))
+      toast.success('Order placed successfully!')
+      dispatch(clearCart())
+      reset()
+    } catch (err) {
+      toast.error('Failed to place order')
+    }
   }
 
   return (
