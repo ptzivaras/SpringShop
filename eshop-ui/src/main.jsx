@@ -6,11 +6,11 @@ import AppRouter from './routes/AppRouter.jsx'
 import { ThemeProvider } from './theme/ThemeContext.jsx'
 // Redux
 import { Provider } from "react-redux";
-import { store } from "./store/store.js";
+import { store } from "./store/store.js"; /* 2.Store */
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {/* Provider = κάνει διαθέσιμο το Redux store σε όλη την React εφαρμογή */}
+    {/* 1. Provider = κάνει διαθέσιμο το Redux store σε όλη την React εφαρμογή */}
     <Provider store={store}>
       <ThemeProvider>{/* Context Dark-Light theme*/}
         <AppRouter />
