@@ -1,15 +1,18 @@
 {
   "categories": [
     { "id": 1, "name": "Phones" },
-    { "id": 2, "name": "Laptops" }
+    { "id": 2, "name": "Laptops" },
+    { "id": 3, "name": "Headphones" },
+    { "id": 4, "name": "Monitors" },
+    { "id": 5, "name": "Accessories" }
   ],
   "products": [
     {
       "id": 101,
       "name": "Pixel 8",
-      "description": "6.2\" OLED, 128GB",
-      "price": 699.0,
-      "stockQty": 12,
+      "description": "6.2\" OLED, 128GB storage, clean Android experience.",
+      "price": 699,
+      "stockQty": 15,
       "categoryId": 1,
       "imageUrl": "/images/pixel8.jpg",
       "createdAt": "2024-01-10T10:00:00Z"
@@ -17,22 +20,112 @@
     {
       "id": 102,
       "name": "iPhone 15",
-      "description": "128GB, A16",
-      "price": 899.0,
-      "stockQty": 7,
+      "description": "128GB, A16 Bionic, great camera and ecosystem.",
+      "price": 899,
+      "stockQty": 9,
       "categoryId": 1,
       "imageUrl": "/images/iphone15.jpg",
       "createdAt": "2024-02-05T09:00:00Z"
     },
     {
+      "id": 103,
+      "name": "Galaxy S24",
+      "description": "Dynamic AMOLED 2X, 256GB, excellent display.",
+      "price": 849,
+      "stockQty": 12,
+      "categoryId": 1,
+      "imageUrl": "/images/galaxy-s24.jpg",
+      "createdAt": "2024-03-02T12:00:00Z"
+    },
+    {
       "id": 201,
       "name": "Dell XPS 13",
-      "description": "i7, 16GB, 512GB",
-      "price": 1299.0,
-      "stockQty": 5,
+      "description": "Intel i7, 16GB RAM, 512GB SSD, premium ultrabook.",
+      "price": 1299,
+      "stockQty": 7,
       "categoryId": 2,
       "imageUrl": "/images/xps13.jpg",
-      "createdAt": "2024-03-01T12:00:00Z"
+      "createdAt": "2024-03-10T08:30:00Z"
+    },
+    {
+      "id": 202,
+      "name": "MacBook Air 13 M3",
+      "description": "8-core CPU, 8GB RAM, 256GB SSD, silent and fast.",
+      "price": 1199,
+      "stockQty": 10,
+      "categoryId": 2,
+      "imageUrl": "/images/macbook-air-m3.jpg",
+      "createdAt": "2024-04-18T14:10:00Z"
+    },
+    {
+      "id": 203,
+      "name": "Lenovo ThinkPad T14",
+      "description": "Ryzen 7, 16GB RAM, 1TB SSD, business classic.",
+      "price": 1399,
+      "stockQty": 5,
+      "categoryId": 2,
+      "imageUrl": "/images/thinkpad-t14.jpg",
+      "createdAt": "2024-05-01T10:15:00Z"
+    },
+    {
+      "id": 301,
+      "name": "Sony WH-1000XM5",
+      "description": "ANC over-ear headphones with great battery life.",
+      "price": 349,
+      "stockQty": 20,
+      "categoryId": 3,
+      "imageUrl": "/images/sony-xm5.jpg",
+      "createdAt": "2024-03-22T16:00:00Z"
+    },
+    {
+      "id": 302,
+      "name": "AirPods Pro (2nd Gen)",
+      "description": "ANC in-ear, spatial audio, seamless with Apple devices.",
+      "price": 249,
+      "stockQty": 25,
+      "categoryId": 3,
+      "imageUrl": "/images/airpods-pro-2.jpg",
+      "createdAt": "2024-02-25T11:45:00Z"
+    },
+    {
+      "id": 401,
+      "name": "LG UltraGear 27\" 144Hz",
+      "description": "Fast IPS, 1ms, great for gaming and work.",
+      "price": 279,
+      "stockQty": 11,
+      "categoryId": 4,
+      "imageUrl": "/images/lg-ultragear-27.jpg",
+      "createdAt": "2024-01-28T09:20:00Z"
+    },
+    {
+      "id": 402,
+      "name": "Dell U2720Q 27\" 4K",
+      "description": "IPS 4K, USB-C, accurate colors for creators.",
+      "price": 529,
+      "stockQty": 6,
+      "categoryId": 4,
+      "imageUrl": "/images/dell-u2720q.jpg",
+      "createdAt": "2024-03-30T13:05:00Z"
+    },
+    {
+      "id": 501,
+      "name": "Logitech MX Master 3S",
+      "description": "Ergonomic mouse, silent clicks, multi-device.",
+      "price": 99,
+      "stockQty": 30,
+      "categoryId": 5,
+      "imageUrl": "/images/mx-master-3s.jpg",
+      "createdAt": "2024-04-05T10:50:00Z"
+    },
+    {
+      "id": 502,
+      "name": "Keychron K6 Wireless",
+      "description": "Hot-swappable 65% mechanical keyboard.",
+      "price": 89,
+      "stockQty": 22,
+      "categoryId": 5,
+      "imageUrl": "/images/keychron-k6.jpg",
+      "createdAt": "2024-04-12T18:30:00Z"
     }
   ],
   "reviews": [
@@ -41,7 +134,7 @@
       "productId": 101,
       "userName": "Maria",
       "rating": 5,
-      "comment": "Πολύ καλό για την τιμή!",
+      "comment": "Άψογο μέγεθος και καθαρό Android.",
       "createdAt": "2024-03-15T08:00:00Z"
     },
     {
@@ -49,8 +142,19 @@
       "productId": 102,
       "userName": "Nikos",
       "rating": 4,
-      "comment": "Άψογη κάμερα.",
+      "comment": "Εξαιρετική κάμερα, λίγο ακριβό.",
       "createdAt": "2024-03-20T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "productId": 301,
+      "userName": "Eleni",
+      "rating": 5,
+      "comment": "Το ANC είναι κορυφή.",
+      "createdAt": "2024-04-02T12:10:00Z"
     }
-  ]
+  ],
+  "orders": [],
+  "orderItems": [],
+  "wishlists": []
 }

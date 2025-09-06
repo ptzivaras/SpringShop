@@ -19,3 +19,8 @@ function App() {
 }
 
 export default App
+
+//2 terminals
+//npm run dev:api
+//npm run dev
+
