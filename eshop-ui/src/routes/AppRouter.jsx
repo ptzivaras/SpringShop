@@ -13,6 +13,12 @@ import {
   clearCart
 } from '../features/cart/cartSlice.js'
 
+// ✅ forms + validation + toasts
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Toaster, toast } from 'react-hot-toast'
+
 function Nav() {
   const cartCount = useSelector(state =>
     state.cart.items.reduce((sum, i) => sum + i.quantity, 0)
@@ -192,7 +198,11 @@ function HomePage() {
               <div style={{ fontSize:12, color:'#666' }}>Stock: {p.stockQty}</div>
               {/* ✅ κουμπί προσθήκης στο καλάθι */}
               <button
-                onClick={() => dispatch(addToCart({ productId: p.id, name: p.name, price: p.price }))}
+                onClick={() => {
+                  // απλό toast feedback
+                  toast.success(`${p.name} added to cart`)
+                  return dispatch(addToCart({ productId: p.id, name: p.name, price: p.price }))
+                }}
                 style={{ marginTop:8, padding:'6px 10px', border:'1px solid #ddd', borderRadius:6, cursor:'pointer' }}
               >
                 Add to Cart
@@ -224,7 +234,10 @@ function ProductPage()  {
       <div style={{ fontWeight:600, marginBottom:8 }}>${product.price}</div>
       <div style={{ fontSize:12, color:'#666', marginBottom:12 }}>Stock: {product.stockQty}</div>
       <button
-        onClick={() => dispatch(addToCart({ productId: product.id, name: product.name, price: product.price }))}
+        onClick={() => {
+          toast.success(`${product.name} added to cart`)
+          return dispatch(addToCart({ productId: product.id, name: product.name, price: product.price }))
+        }}
         style={{ padding:'6px 10px', border:'1px solid #ddd', borderRadius:6, cursor:'pointer', marginBottom:16 }}
       >
         Add to Cart
@@ -248,13 +261,135 @@ function ProductPage()  {
 }
 
 // function CartPage()     { return <h1 style={{padding:20}}>Cart Page</h1> }
-function CheckoutPage() { return <h1 style={{padding:20}}>Checkout Page</h1> }
-function AdminPage()    { return <h1 style={{padding:20}}>Admin Page</h1> }
+
+// ✅ Checkout με react-hook-form + zod
+const checkoutSchema = z.object({
+  fullName: z.string().min(2, 'Enter your full name'),
+  email: z.string().email('Invalid email'),
+  address: z.string().min(5, 'Enter a valid address'),
+  city: z.string().min(2, 'Enter city'),
+  zip: z.string().min(4, 'Enter ZIP/postal code'),
+  payment: z.enum(['cod', 'card'])
+})
+
+function CheckoutPage() {
+  const items = useSelector(state => state.cart.items)
+  const total = items.reduce((s, i) => s + i.price * i.quantity, 0)
+  const dispatch = useDispatch()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset
+  } = useForm({
+    resolver: zodResolver(checkoutSchema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      address: '',
+      city: '',
+      zip: '',
+      payment: 'cod'
+    }
+  })
+
+  const onSubmit = async (data) => {
+    // mock “order submit”
+    // εδώ αργότερα μπορούμε να POST στο /orders & /orderItems
+    toast.success('Order placed successfully!')
+    dispatch(clearCart())
+    reset()
+  }
+
+  return (
+    <div style={{ padding:20, display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display:'grid', gap:10 }}>
+        <h1>Checkout</h1>
+
+        <label>
+          Full name
+          <input {...register('fullName')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
+          {errors.fullName && <div style={{ color:'crimson' }}>{errors.fullName.message}</div>}
+        </label>
+
+        <label>
+          Email
+          <input {...register('email')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
+          {errors.email && <div style={{ color:'crimson' }}>{errors.email.message}</div>}
+        </label>
+
+        <label>
+          Address
+          <input {...register('address')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
+          {errors.address && <div style={{ color:'crimson' }}>{errors.address.message}</div>}
+        </label>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+          <label>
+            City
+            <input {...register('city')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
+            {errors.city && <div style={{ color:'crimson' }}>{errors.city.message}</div>}
+          </label>
+          <label>
+            ZIP
+            <input {...register('zip')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
+            {errors.zip && <div style={{ color:'crimson' }}>{errors.zip.message}</div>}
+          </label>
+        </div>
+
+        <fieldset style={{ border:'1px solid #eee', borderRadius:8, padding:10 }}>
+          <legend>Payment</legend>
+          <label style={{ display:'block', marginBottom:6 }}>
+            <input type="radio" value="cod" {...register('payment')} /> Cash on Delivery
+          </label>
+          <label style={{ display:'block' }}>
+            <input type="radio" value="card" {...register('payment')} /> Card (mock)
+          </label>
+          {errors.payment && <div style={{ color:'crimson' }}>{errors.payment.message}</div>}
+        </fieldset>
+
+        <button
+          type="submit"
+          disabled={isSubmitting || items.length === 0}
+          style={{ padding:'10px 12px', border:'1px solid #ddd', borderRadius:8, cursor: items.length ? 'pointer' : 'not-allowed' }}
+        >
+          Place Order
+        </button>
+
+        {items.length === 0 && (
+          <div style={{ color:'#666', fontSize:12 }}>
+            Cart is empty — add items from <Link to="/">Home</Link>.
+          </div>
+        )}
+      </form>
+
+      {/* Order summary */}
+      <div>
+        <h2>Order Summary</h2>
+        {items.length === 0 ? (
+          <div>No items.</div>
+        ) : (
+          <ul style={{ listStyle:'none', padding:0 }}>
+            {items.map(i => (
+              <li key={i.productId} style={{ borderBottom:'1px solid #eee', padding:'8px 0' }}>
+                {i.name} x {i.quantity} — ${i.price * i.quantity}
+              </li>
+            ))}
+          </ul>
+        )}
+        <h3 style={{ marginTop:12 }}>Total: ${total}</h3>
+      </div>
+    </div>
+  )
+}
+
 function NotFound()     { return <h1 style={{padding:20}}>Not Found</h1> }
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" /> {/* toasts UI */}
       <Nav /> 
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -262,7 +397,7 @@ export default function AppRouter() {
         {/* ✅ κάνουμε render το κανονικό CartPage component */}
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<h1 style={{padding:20}}>Admin Page</h1>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
