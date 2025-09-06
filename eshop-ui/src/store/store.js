@@ -4,8 +4,8 @@ import { baseApi } from '../api/baseApi.js'
 
 export const store = configureStore({
   reducer: {
-    // cart: cartReducer,
-    [baseApi.reducerPath]: baseApi.reducer
+    [baseApi.reducerPath]: baseApi.reducer,
+    cart: cartReducer
   }, // εδω ολοι οι reducers απο τα slices
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(baseApi.middleware)

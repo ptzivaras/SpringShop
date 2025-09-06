@@ -1,14 +1,20 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useGetProductsQuery } from '../api/productsApi.js'
 import { useGetCategoriesQuery } from '../api/categoriesApi.js'
+import { addToCart } from '../features/cart/cartSlice.js'
+
 
 function Nav() {
+  const cartCount = useSelector(state =>
+    state.cart.items.reduce((sum, i) => sum + i.quantity, 0)
+  )
   return (
     <nav style={{display: 'flex', gap: 12, padding: 12, borderBottom: '1px solid #ddd'}}>
       <Link to="/">Home</Link>
       <Link to="/product/101">Product</Link>
-      <Link to="/cart">Cart</Link>
+      <Link to="/cart">Cart ({cartCount})</Link>
       <Link to="/checkout">Checkout</Link>
       <Link to="/admin">Admin</Link>
     </nav>
@@ -16,6 +22,7 @@ function Nav() {
 }
 
 function HomePage() {
+  const dispatch = useDispatch()
   const [page, setPage] = useState(1)
   const [limit] = useState(8)
   const [categoryId, setCategoryId] = useState('')
@@ -144,7 +151,7 @@ export default function AppRouter() {
     <BrowserRouter>
     <Nav /> 
       <Routes>
-        <Route path="/" element={<h1>Home Page</h1>} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<h1>Product Page</h1>} />
         <Route path="/cart" element={<h1>Cart Page</h1>} />
         <Route path="/checkout" element={<h1>Checkout Page</h1>} />
