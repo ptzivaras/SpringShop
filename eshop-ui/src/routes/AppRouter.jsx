@@ -21,6 +21,55 @@ function Nav() {
   )
 }
 
+function CartPage() {
+  const items = useSelector(state => state.cart.items)
+  const dispatch = useDispatch()
+
+  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+
+  return (
+    <div style={{ padding:20 }}>
+      <h1>Cart</h1>
+      {items.length === 0 ? (
+        <p>Cart is empty</p>
+      ) : (
+        <>
+          <ul style={{ listStyle:'none', padding:0 }}>
+            {items.map(i => (
+              <li key={i.productId} style={{ borderBottom:'1px solid #eee', padding:'10px 0' }}>
+                <div style={{ fontWeight:600 }}>{i.name}</div>
+                <div>${i.price} x {i.quantity} = ${i.price * i.quantity}</div>
+                <div style={{ marginTop:6 }}>
+                  <button
+                    onClick={() => dispatch(decreaseQuantity(i.productId))}
+                    style={{ marginRight:6 }}
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => dispatch(increaseQuantity(i.productId))}
+                    style={{ marginRight:6 }}
+                  >
+                    +
+                  </button>
+                  <button onClick={() => dispatch(removeFromCart(i.productId))}>
+                    Remove
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <h2 style={{ marginTop:20 }}>Total: ${total}</h2>
+          <button onClick={() => dispatch(clearCart())} style={{ marginTop:10 }}>
+            Clear Cart
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
+
 function HomePage() {
   const dispatch = useDispatch()
   const [page, setPage] = useState(1)
