@@ -11,7 +11,10 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* Provider = κάνει διαθέσιμο το Redux store σε όλη την React εφαρμογή */}
     <Provider store={store}>
-      <App />
+      
+      <ThemeProvider>
+        <AppRouter />
+      </ThemeProvider>
     </Provider>
   </StrictMode>,
 )

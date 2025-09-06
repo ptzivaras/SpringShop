@@ -16,3 +16,19 @@ RTK Query έχει ήδη:
 -caching
 -loading/error states
 -automatic re-fetching & invalidation
+
+Folder Structure
+src/
+  app/            # redux store, root providers
+  api/            # RTK Query api slices
+  features/
+    cart/         # cart slice & components
+    products/     # product list, product details
+    categories/   # categories logic
+    reviews/      # reviews per product
+  components/     # shared UI components (Header, Footer, Button, etc.)
+  pages/          # route-level pages (Home, Cart, Checkout, Admin)
+  routes/         # React Router setup
+  theme/          # dark/light ThemeContext
+  lib/            # helpers (utils, formatters, storage)
+

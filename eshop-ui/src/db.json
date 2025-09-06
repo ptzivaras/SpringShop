@@ -1,0 +1,56 @@
+{
+  "categories": [
+    { "id": 1, "name": "Phones" },
+    { "id": 2, "name": "Laptops" }
+  ],
+  "products": [
+    {
+      "id": 101,
+      "name": "Pixel 8",
+      "description": "6.2\" OLED, 128GB",
+      "price": 699.0,
+      "stockQty": 12,
+      "categoryId": 1,
+      "imageUrl": "/images/pixel8.jpg",
+      "createdAt": "2024-01-10T10:00:00Z"
+    },
+    {
+      "id": 102,
+      "name": "iPhone 15",
+      "description": "128GB, A16",
+      "price": 899.0,
+      "stockQty": 7,
+      "categoryId": 1,
+      "imageUrl": "/images/iphone15.jpg",
+      "createdAt": "2024-02-05T09:00:00Z"
+    },
+    {
+      "id": 201,
+      "name": "Dell XPS 13",
+      "description": "i7, 16GB, 512GB",
+      "price": 1299.0,
+      "stockQty": 5,
+      "categoryId": 2,
+      "imageUrl": "/images/xps13.jpg",
+      "createdAt": "2024-03-01T12:00:00Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "productId": 101,
+      "userName": "Maria",
+      "rating": 5,
+      "comment": "Πολύ καλό για την τιμή!",
+      "createdAt": "2024-03-15T08:00:00Z"
+    },
+    {
+      "id": 2,
+      "productId": 102,
+      "userName": "Nikos",
+      "rating": 4,
+      "comment": "Άψογη κάμερα.",
+      "createdAt": "2024-03-20T14:30:00Z"
+    }
+  ]
+}
