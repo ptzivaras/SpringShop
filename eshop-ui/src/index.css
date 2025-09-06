@@ -1,16 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 import */
+@import "tailwindcss";
 
-/* App base tweaks */
-:root {
-  color-scheme: light dark;
-}
-
+/* reset sizing */
 html, body, #root {
   height: 100%;
+  width: 100%;
 }
 
+/* βασικό φόντο/κειμενο */
 body {
-  @apply antialiased;
+  min-height: 100dvh;
+  background: #f8fafc; /* slate-50 */
+  color: #0f172a;      /* slate-900 */
 }
+
+/* προαιρετικά βολικές default συμπεριφορές */
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }

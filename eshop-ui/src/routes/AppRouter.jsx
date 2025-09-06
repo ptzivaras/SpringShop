@@ -24,13 +24,20 @@ function Nav() {
     state.cart.items.reduce((sum, i) => sum + i.quantity, 0)
   )
   return (
-    <nav style={{display: 'flex', gap: 12, padding: 12, borderBottom: '1px solid #ddd'}}>
-      <Link to="/">Home</Link>
-      <Link to="/product/101">Product</Link>
-      <Link to="/cart">Cart ({cartCount})</Link>
-      <Link to="/checkout">Checkout</Link>
-      <Link to="/admin">Admin</Link>
-    </nav>
+    <header className="sticky top-0 z-40 border-b bg-white/90 backdrop-blur">
+      <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+        <Link to="/" className="font-semibold text-lg">E-Shop</Link>
+        <div className="ml-auto flex items-center gap-3">
+          <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/">Home</Link>
+          <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/product/101">Product</Link>
+          <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/cart">
+            Cart <span className="ml-1 inline-flex min-w-5 items-center justify-center rounded-full bg-gray-900 px-1.5 text-[10px] font-bold text-white">{cartCount}</span>
+          </Link>
+          <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/checkout">Checkout</Link>
+          <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/admin">Admin</Link>
+        </div>
+      </nav>
+    </header>
   )
 }
 
@@ -41,41 +48,49 @@ function CartPage() {
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
   return (
-    <div style={{ padding:20 }}>
-      <h1>Cart</h1>
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      <h1 className="mb-4 text-2xl font-semibold">Cart</h1>
       {items.length === 0 ? (
-        <p>Cart is empty</p>
+        <p className="text-gray-600">Cart is empty</p>
       ) : (
         <>
-          <ul style={{ listStyle:'none', padding:0 }}>
+          <ul className="divide-y rounded-md border">
             {items.map(i => (
-              <li key={i.productId} style={{ borderBottom:'1px solid #eee', padding:'10px 0' }}>
-                <div style={{ fontWeight:600 }}>{i.name}</div>
-                <div>${i.price} x {i.quantity} = ${i.price * i.quantity}</div>
-                <div style={{ marginTop:6 }}>
+              <li key={i.productId} className="flex items-center justify-between gap-4 p-4">
+                <div>
+                  <div className="font-medium">{i.name}</div>
+                  <div className="text-sm text-gray-600">${i.price} x {i.quantity} = <span className="font-semibold text-gray-900">${i.price * i.quantity}</span></div>
+                </div>
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => dispatch(decreaseQuantity(i.productId))}
-                    style={{ marginRight:6 }}
-                  >
-                    -
-                  </button>
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-gray-50"
+                    title="Decrease"
+                  >−</button>
                   <button
                     onClick={() => dispatch(increaseQuantity(i.productId))}
-                    style={{ marginRight:6 }}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-gray-50"
+                    title="Increase"
+                  >+</button>
+                  <button
+                    onClick={() => dispatch(removeFromCart(i.productId))}
+                    className="rounded-md border px-3 py-1.5 text-sm hover:bg-red-50 hover:text-red-700"
                   >
-                    +
-                  </button>
-                  <button onClick={() => dispatch(removeFromCart(i.productId))}>
                     Remove
                   </button>
                 </div>
               </li>
             ))}
           </ul>
-          <h2 style={{ marginTop:20 }}>Total: ${total}</h2>
-          <button onClick={() => dispatch(clearCart())} style={{ marginTop:10 }}>
-            Clear Cart
-          </button>
+          <div className="mt-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Total: ${total}</h2>
+            <button
+              onClick={() => dispatch(clearCart())}
+              className="rounded-md border px-4 py-2 text-sm hover:bg-gray-50"
+            >
+              Clear Cart
+            </button>
+          </div>
         </>
       )}
     </div>
@@ -114,26 +129,24 @@ function HomePage() {
   //if (isError)   return <p style={{padding:20}}>Error loading products</p>
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1 style={{ marginBottom: 12 }}>Products</h1>
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      <h1 className="mb-4 text-2xl font-semibold">Products</h1>
 
       {/* Φίλτρα */}
-      <div style={{
-        display:'grid',
-        gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr',
-        gap: 8,
-        marginBottom: 12
-      }}>
+      <div
+        className="mb-4 grid gap-3 rounded-lg border p-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+        style={{ /* κρατάω το comment block σου */ }}
+      >
         <input
           placeholder="Search…"
           value={search}
           onChange={(e) => { setPage(1); setSearch(e.target.value) }}
-          style={{ padding: 8, border:'1px solid #ddd', borderRadius:8 }}
+          className="w-full rounded-md border px-3 py-2 text-sm outline-none ring-0 focus:border-gray-400"
         />
         <select
           value={categoryId}
           onChange={(e) => { setPage(1); setCategoryId(e.target.value) }}
-          style={{ padding: 8, border:'1px solid #ddd', borderRadius:8 }}
+          className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-gray-400"
         >
           <option value="">All categories</option>
           {!catLoading && categories.map(c => (
@@ -143,7 +156,7 @@ function HomePage() {
         <select
           value={sort}
           onChange={(e) => { setPage(1); setSort(e.target.value) }}
-          style={{ padding: 8, border:'1px solid #ddd', borderRadius:8 }}
+          className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-gray-400"
         >
           <option value="createdAt">Newest</option>
           <option value="price">Price</option>
@@ -152,24 +165,24 @@ function HomePage() {
         <select
           value={order}
           onChange={(e) => { setPage(1); setOrder(e.target.value) }}
-          style={{ padding: 8, border:'1px solid #ddd', borderRadius:8 }}
+          className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-gray-400"
         >
           <option value="desc">Desc</option>
           <option value="asc">Asc</option>
         </select>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8 }}>
+        <div className="flex items-center justify-end gap-2">
           <button
             disabled={!canGoPrev}
             onClick={() => setPage(p => Math.max(1, p - 1))}
-            style={{ padding:'8px 10px', border:'1px solid #ddd', borderRadius:8, background:'#f5f5f5', cursor: canGoPrev ? 'pointer' : 'not-allowed' }}
+            className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-50"
           >
             ← Prev
           </button>
-          <span>Page {page}</span>
+          <span className="text-sm">Page {page}</span>
           <button
             disabled={!canGoNext}
             onClick={() => setPage(p => p + 1)}
-            style={{ padding:'8px 10px', border:'1px solid #ddd', borderRadius:8, background:'#f5f5f5', cursor: canGoNext ? 'pointer' : 'not-allowed' }}
+            className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-50"
           >
             Next →
           </button>
@@ -177,25 +190,19 @@ function HomePage() {
       </div>
 
       {/* Λίστα προϊόντων */}
-      {isLoading && <div>Loading products…</div>}
-      {isError && <div>Error loading products</div>}
+      {isLoading && <div className="text-gray-600">Loading products…</div>}
+      {isError && <div className="text-red-600">Error loading products</div>}
       {!isLoading && !isError && (
-        <ul style={{
-          display:'grid',
-          gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))',
-          gap: 12,
-          listStyle:'none',
-          padding: 0
-        }}>
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map(p => (
-            <li key={p.id} style={{ border:'1px solid #eee', borderRadius:12, padding:12 }}>
+            <li key={p.id} className="rounded-xl border p-4 shadow-sm transition hover:shadow-md">
               {/* Link σε product page */}
-              <div style={{ fontWeight: 600, marginBottom:4 }}>
-                <Link to={`/product/${p.id}`}>{p.name}</Link>
+              <div className="mb-1 font-semibold">
+                <Link to={`/product/${p.id}`} className="hover:underline">{p.name}</Link>
               </div>
-              <div style={{ color:'#666', fontSize:14, minHeight:38 }}>{p.description}</div>
-              <div style={{ marginTop:8, fontWeight:600 }}>${p.price}</div>
-              <div style={{ fontSize:12, color:'#666' }}>Stock: {p.stockQty}</div>
+              <div className="min-h-[42px] text-sm text-gray-600">{p.description}</div>
+              <div className="mt-2 font-semibold">${p.price}</div>
+              <div className="text-xs text-gray-500">Stock: {p.stockQty}</div>
               {/* ✅ κουμπί προσθήκης στο καλάθι */}
               <button
                 onClick={() => {
@@ -203,7 +210,7 @@ function HomePage() {
                   toast.success(`${p.name} added to cart`)
                   return dispatch(addToCart({ productId: p.id, name: p.name, price: p.price }))
                 }}
-                style={{ marginTop:8, padding:'6px 10px', border:'1px solid #ddd', borderRadius:6, cursor:'pointer' }}
+                className="mt-3 w-full rounded-md border px-3 py-2 text-sm hover:bg-gray-50"
               >
                 Add to Cart
               </button>
@@ -223,35 +230,35 @@ function ProductPage()  {
   const { data: product, isLoading, isError } = useGetProductByIdQuery(id)
   const { data: reviews = [], isLoading: rLoading } = useGetReviewsByProductQuery(id)
 
-  if (isLoading) return <div style={{padding:20}}>Loading product…</div>
-  if (isError || !product) return <div style={{padding:20}}>Product not found</div>
+  if (isLoading) return <div className="mx-auto max-w-4xl px-4 py-6">Loading product…</div>
+  if (isError || !product) return <div className="mx-auto max-w-4xl px-4 py-6 text-red-600">Product not found</div>
 
   return (
-    <div style={{ padding:20 }}>
-      <button onClick={() => navigate(-1)} style={{ marginBottom:12 }}>← Back</button>
-      <h1 style={{ marginBottom:4 }}>{product.name}</h1>
-      <div style={{ color:'#666', marginBottom:8 }}>{product.description}</div>
-      <div style={{ fontWeight:600, marginBottom:8 }}>${product.price}</div>
-      <div style={{ fontSize:12, color:'#666', marginBottom:12 }}>Stock: {product.stockQty}</div>
+    <div className="mx-auto max-w-4xl px-4 py-6">
+      <button onClick={() => navigate(-1)} className="mb-3 rounded-md border px-3 py-2 text-sm hover:bg-gray-50">← Back</button>
+      <h1 className="mb-1 text-2xl font-semibold">{product.name}</h1>
+      <div className="mb-2 text-gray-600">{product.description}</div>
+      <div className="mb-2 font-semibold">${product.price}</div>
+      <div className="mb-4 text-xs text-gray-500">Stock: {product.stockQty}</div>
       <button
         onClick={() => {
           toast.success(`${product.name} added to cart`)
           return dispatch(addToCart({ productId: product.id, name: product.name, price: product.price }))
         }}
-        style={{ padding:'6px 10px', border:'1px solid #ddd', borderRadius:6, cursor:'pointer', marginBottom:16 }}
+        className="mb-4 rounded-md border px-3 py-2 text-sm hover:bg-gray-50"
       >
         Add to Cart
       </button>
 
-      <h2 style={{ marginTop:8, marginBottom:8 }}>Reviews</h2>
+      <h2 className="mb-2 text-xl font-semibold">Reviews</h2>
       {rLoading && <div>Loading reviews…</div>}
-      {!rLoading && reviews.length === 0 && <div>No reviews yet.</div>}
+      {!rLoading && reviews.length === 0 && <div className="text-gray-600">No reviews yet.</div>}
       {!rLoading && reviews.length > 0 && (
-        <ul style={{ listStyle:'none', padding:0 }}>
+        <ul className="divide-y rounded-md border">
           {reviews.map(rv => (
-            <li key={rv.id} style={{ borderBottom:'1px solid #eee', padding:'8px 0' }}>
-              <div style={{ fontWeight:600 }}>{rv.userName} ★ {rv.rating}/5</div>
-              <div style={{ color:'#444' }}>{rv.comment}</div>
+            <li key={rv.id} className="p-3">
+              <div className="font-medium">{rv.userName} ★ {rv.rating}/5</div>
+              <div className="text-gray-700">{rv.comment}</div>
             </li>
           ))}
         </ul>
@@ -303,88 +310,89 @@ function CheckoutPage() {
   }
 
   return (
-    <div style={{ padding:20, display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-      <form onSubmit={handleSubmit(onSubmit)} style={{ display:'grid', gap:10 }}>
-        <h1>Checkout</h1>
+    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-6 md:grid-cols-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <h1 className="text-2xl font-semibold">Checkout</h1>
 
-        <label>
+        <label className="block text-sm">
           Full name
-          <input {...register('fullName')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
-          {errors.fullName && <div style={{ color:'crimson' }}>{errors.fullName.message}</div>}
+          <input {...register('fullName')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+          {errors.fullName && <div className="text-sm text-red-600">{errors.fullName.message}</div>}
         </label>
 
-        <label>
+        <label className="block text-sm">
           Email
-          <input {...register('email')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
-          {errors.email && <div style={{ color:'crimson' }}>{errors.email.message}</div>}
+          <input {...register('email')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+          {errors.email && <div className="text-sm text-red-600">{errors.email.message}</div>}
         </label>
 
-        <label>
+        <label className="block text-sm">
           Address
-          <input {...register('address')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
-          {errors.address && <div style={{ color:'crimson' }}>{errors.address.message}</div>}
+          <input {...register('address')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+          {errors.address && <div className="text-sm text-red-600">{errors.address.message}</div>}
         </label>
 
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-          <label>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="block text-sm">
             City
-            <input {...register('city')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
-            {errors.city && <div style={{ color:'crimson' }}>{errors.city.message}</div>}
+            <input {...register('city')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+            {errors.city && <div className="text-sm text-red-600">{errors.city.message}</div>}
           </label>
-          <label>
+          <label className="block text-sm">
             ZIP
-            <input {...register('zip')} style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:8 }}/>
-            {errors.zip && <div style={{ color:'crimson' }}>{errors.zip.message}</div>}
+            <input {...register('zip')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+            {errors.zip && <div className="text-sm text-red-600">{errors.zip.message}</div>}
           </label>
         </div>
 
-        <fieldset style={{ border:'1px solid #eee', borderRadius:8, padding:10 }}>
-          <legend>Payment</legend>
-          <label style={{ display:'block', marginBottom:6 }}>
+        <fieldset className="rounded-md border p-3">
+          <legend className="text-sm font-medium">Payment</legend>
+          <label className="mt-2 flex items-center gap-2 text-sm">
             <input type="radio" value="cod" {...register('payment')} /> Cash on Delivery
           </label>
-          <label style={{ display:'block' }}>
+          <label className="mt-1 flex items-center gap-2 text-sm">
             <input type="radio" value="card" {...register('payment')} /> Card (mock)
           </label>
-          {errors.payment && <div style={{ color:'crimson' }}>{errors.payment.message}</div>}
+          {errors.payment && <div className="text-sm text-red-600">{errors.payment.message}</div>}
         </fieldset>
 
         <button
           type="submit"
           disabled={isSubmitting || items.length === 0}
-          style={{ padding:'10px 12px', border:'1px solid #ddd', borderRadius:8, cursor: items.length ? 'pointer' : 'not-allowed' }}
+          className="w-full rounded-md border px-4 py-2 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Place Order
         </button>
 
         {items.length === 0 && (
-          <div style={{ color:'#666', fontSize:12 }}>
-            Cart is empty — add items from <Link to="/">Home</Link>.
+          <div className="text-xs text-gray-600">
+            Cart is empty — add items from <Link to="/" className="underline">Home</Link>.
           </div>
         )}
       </form>
 
       {/* Order summary */}
       <div>
-        <h2>Order Summary</h2>
+        <h2 className="mb-2 text-xl font-semibold">Order Summary</h2>
         {items.length === 0 ? (
-          <div>No items.</div>
+          <div className="text-gray-600">No items.</div>
         ) : (
-          <ul style={{ listStyle:'none', padding:0 }}>
+          <ul className="divide-y rounded-md border">
             {items.map(i => (
-              <li key={i.productId} style={{ borderBottom:'1px solid #eee', padding:'8px 0' }}>
-                {i.name} x {i.quantity} — ${i.price * i.quantity}
+              <li key={i.productId} className="flex items-center justify-between p-3">
+                <div className="text-sm">{i.name} x {i.quantity}</div>
+                <div className="text-sm font-medium">${i.price * i.quantity}</div>
               </li>
             ))}
           </ul>
         )}
-        <h3 style={{ marginTop:12 }}>Total: ${total}</h3>
+        <h3 className="mt-3 text-lg font-semibold">Total: ${total}</h3>
       </div>
     </div>
   )
 }
 
-function NotFound()     { return <h1 style={{padding:20}}>Not Found</h1> }
+function NotFound()     { return <h1 className="mx-auto max-w-6xl px-4 py-6 text-red-600">Not Found</h1> }
 
 export default function AppRouter() {
   return (
@@ -397,7 +405,7 @@ export default function AppRouter() {
         {/* ✅ κάνουμε render το κανονικό CartPage component */}
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/admin" element={<h1 style={{padding:20}}>Admin Page</h1>} />
+        <Route path="/admin" element={<h1 className="mx-auto max-w-6xl px-4 py-6">Admin Page</h1>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
