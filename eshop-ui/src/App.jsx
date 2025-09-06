@@ -8,7 +8,7 @@ function App() {
   return (
     <>
    
-     <div style={{ padding: 24 }}>
+     <div  style={{ padding: 24 }}>
       <h1>Eshop UI</h1>
       <p>μυ app is running.</p>
     </div>

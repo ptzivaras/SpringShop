@@ -24,7 +24,7 @@ function Nav() {
     state.cart.items.reduce((sum, i) => sum + i.quantity, 0)
   )
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link to="/" className="font-semibold text-lg">E-Shop</Link>
         <div className="ml-auto flex items-center gap-3">
@@ -54,7 +54,7 @@ function CartPage() {
         <p className="text-gray-600">Cart is empty</p>
       ) : (
         <>
-          <ul className="divide-y rounded-md border">
+          <ul className="divide-y rounded-xl border bg-white shadow-sm">
             {items.map(i => (
               <li key={i.productId} className="flex items-center justify-between gap-4 p-4">
                 <div>
@@ -64,17 +64,17 @@ function CartPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => dispatch(decreaseQuantity(i.productId))}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-gray-50"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border bg-white shadow-sm hover:bg-gray-50"
                     title="Decrease"
                   >−</button>
                   <button
                     onClick={() => dispatch(increaseQuantity(i.productId))}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-gray-50"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border bg-white shadow-sm hover:bg-gray-50"
                     title="Increase"
                   >+</button>
                   <button
                     onClick={() => dispatch(removeFromCart(i.productId))}
-                    className="rounded-md border px-3 py-1.5 text-sm hover:bg-red-50 hover:text-red-700"
+                    className="rounded-md border bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-red-50 hover:text-red-700"
                   >
                     Remove
                   </button>
@@ -86,7 +86,7 @@ function CartPage() {
             <h2 className="text-xl font-semibold">Total: ${total}</h2>
             <button
               onClick={() => dispatch(clearCart())}
-              className="rounded-md border px-4 py-2 text-sm hover:bg-gray-50"
+              className="rounded-md border bg-white px-4 py-2 text-sm shadow-sm hover:bg-gray-50"
             >
               Clear Cart
             </button>
@@ -134,19 +134,19 @@ function HomePage() {
 
       {/* Φίλτρα */}
       <div
-        className="mb-4 grid gap-3 rounded-lg border p-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+        className="mb-4 grid gap-3 rounded-xl border bg-white p-3 shadow-sm sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
         style={{ /* κρατάω το comment block σου */ }}
       >
         <input
           placeholder="Search…"
           value={search}
           onChange={(e) => { setPage(1); setSearch(e.target.value) }}
-          className="w-full rounded-md border px-3 py-2 text-sm outline-none ring-0 focus:border-gray-400"
+          className="w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"
         />
         <select
           value={categoryId}
           onChange={(e) => { setPage(1); setCategoryId(e.target.value) }}
-          className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-gray-400"
+          className="w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"
         >
           <option value="">All categories</option>
           {!catLoading && categories.map(c => (
@@ -156,7 +156,7 @@ function HomePage() {
         <select
           value={sort}
           onChange={(e) => { setPage(1); setSort(e.target.value) }}
-          className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-gray-400"
+          className="w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"
         >
           <option value="createdAt">Newest</option>
           <option value="price">Price</option>
@@ -165,7 +165,7 @@ function HomePage() {
         <select
           value={order}
           onChange={(e) => { setPage(1); setOrder(e.target.value) }}
-          className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-gray-400"
+          className="w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"
         >
           <option value="desc">Desc</option>
           <option value="asc">Asc</option>
@@ -174,7 +174,7 @@ function HomePage() {
           <button
             disabled={!canGoPrev}
             onClick={() => setPage(p => Math.max(1, p - 1))}
-            className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-50"
+            className="rounded-md border bg-white px-3 py-2 text-sm shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             ← Prev
           </button>
@@ -182,7 +182,7 @@ function HomePage() {
           <button
             disabled={!canGoNext}
             onClick={() => setPage(p => p + 1)}
-            className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-50"
+            className="rounded-md border bg-white px-3 py-2 text-sm shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Next →
           </button>
@@ -193,9 +193,9 @@ function HomePage() {
       {isLoading && <div className="text-gray-600">Loading products…</div>}
       {isError && <div className="text-red-600">Error loading products</div>}
       {!isLoading && !isError && (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map(p => (
-            <li key={p.id} className="rounded-xl border p-4 shadow-sm transition hover:shadow-md">
+            <li key={p.id} className="rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md">
               {/* Link σε product page */}
               <div className="mb-1 font-semibold">
                 <Link to={`/product/${p.id}`} className="hover:underline">{p.name}</Link>
@@ -210,7 +210,7 @@ function HomePage() {
                   toast.success(`${p.name} added to cart`)
                   return dispatch(addToCart({ productId: p.id, name: p.name, price: p.price }))
                 }}
-                className="mt-3 w-full rounded-md border px-3 py-2 text-sm hover:bg-gray-50"
+                className="mt-3 w-full rounded-md border bg-white px-3 py-2 text-sm shadow-sm hover:bg-gray-50"
               >
                 Add to Cart
               </button>
@@ -235,34 +235,36 @@ function ProductPage()  {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
-      <button onClick={() => navigate(-1)} className="mb-3 rounded-md border px-3 py-2 text-sm hover:bg-gray-50">← Back</button>
-      <h1 className="mb-1 text-2xl font-semibold">{product.name}</h1>
-      <div className="mb-2 text-gray-600">{product.description}</div>
-      <div className="mb-2 font-semibold">${product.price}</div>
-      <div className="mb-4 text-xs text-gray-500">Stock: {product.stockQty}</div>
-      <button
-        onClick={() => {
-          toast.success(`${product.name} added to cart`)
-          return dispatch(addToCart({ productId: product.id, name: product.name, price: product.price }))
-        }}
-        className="mb-4 rounded-md border px-3 py-2 text-sm hover:bg-gray-50"
-      >
-        Add to Cart
-      </button>
+      <div className="rounded-xl border bg-white p-5 shadow-sm">
+        <button onClick={() => navigate(-1)} className="mb-3 rounded-md border bg-white px-3 py-2 text-sm shadow-sm hover:bg-gray-50">← Back</button>
+        <h1 className="mb-1 text-2xl font-semibold">{product.name}</h1>
+        <div className="mb-2 text-gray-600">{product.description}</div>
+        <div className="mb-2 font-semibold">${product.price}</div>
+        <div className="mb-4 text-xs text-gray-500">Stock: {product.stockQty}</div>
+        <button
+          onClick={() => {
+            toast.success(`${product.name} added to cart`)
+            return dispatch(addToCart({ productId: product.id, name: product.name, price: product.price }))
+          }}
+          className="mb-4 rounded-md border bg-white px-3 py-2 text-sm shadow-sm hover:bg-gray-50"
+        >
+          Add to Cart
+        </button>
 
-      <h2 className="mb-2 text-xl font-semibold">Reviews</h2>
-      {rLoading && <div>Loading reviews…</div>}
-      {!rLoading && reviews.length === 0 && <div className="text-gray-600">No reviews yet.</div>}
-      {!rLoading && reviews.length > 0 && (
-        <ul className="divide-y rounded-md border">
-          {reviews.map(rv => (
-            <li key={rv.id} className="p-3">
-              <div className="font-medium">{rv.userName} ★ {rv.rating}/5</div>
-              <div className="text-gray-700">{rv.comment}</div>
-            </li>
-          ))}
-        </ul>
-      )}
+        <h2 className="mb-2 text-xl font-semibold">Reviews</h2>
+        {rLoading && <div>Loading reviews…</div>}
+        {!rLoading && reviews.length === 0 && <div className="text-gray-600">No reviews yet.</div>}
+        {!rLoading && reviews.length > 0 && (
+          <ul className="divide-y rounded-xl border bg-white shadow-sm">
+            {reviews.map(rv => (
+              <li key={rv.id} className="p-3">
+                <div className="font-medium">{rv.userName} ★ {rv.rating}/5</div>
+                <div className="text-gray-700">{rv.comment}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }
@@ -316,36 +318,36 @@ function CheckoutPage() {
 
         <label className="block text-sm">
           Full name
-          <input {...register('fullName')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+          <input {...register('fullName')} className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"/>
           {errors.fullName && <div className="text-sm text-red-600">{errors.fullName.message}</div>}
         </label>
 
         <label className="block text-sm">
           Email
-          <input {...register('email')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+          <input {...register('email')} className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"/>
           {errors.email && <div className="text-sm text-red-600">{errors.email.message}</div>}
         </label>
 
         <label className="block text-sm">
           Address
-          <input {...register('address')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+          <input {...register('address')} className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"/>
           {errors.address && <div className="text-sm text-red-600">{errors.address.message}</div>}
         </label>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label className="block text-sm">
             City
-            <input {...register('city')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+            <input {...register('city')} className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"/>
             {errors.city && <div className="text-sm text-red-600">{errors.city.message}</div>}
           </label>
           <label className="block text-sm">
             ZIP
-            <input {...register('zip')} className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:border-gray-400"/>
+            <input {...register('zip')} className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300"/>
             {errors.zip && <div className="text-sm text-red-600">{errors.zip.message}</div>}
           </label>
         </div>
 
-        <fieldset className="rounded-md border p-3">
+        <fieldset className="rounded-xl border bg-white p-3 shadow-sm">
           <legend className="text-sm font-medium">Payment</legend>
           <label className="mt-2 flex items-center gap-2 text-sm">
             <input type="radio" value="cod" {...register('payment')} /> Cash on Delivery
@@ -359,7 +361,7 @@ function CheckoutPage() {
         <button
           type="submit"
           disabled={isSubmitting || items.length === 0}
-          className="w-full rounded-md border px-4 py-2 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-md border bg-white px-4 py-2 text-sm shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Place Order
         </button>
@@ -377,7 +379,7 @@ function CheckoutPage() {
         {items.length === 0 ? (
           <div className="text-gray-600">No items.</div>
         ) : (
-          <ul className="divide-y rounded-md border">
+          <ul className="divide-y rounded-xl border bg-white shadow-sm">
             {items.map(i => (
               <li key={i.productId} className="flex items-center justify-between p-3">
                 <div className="text-sm">{i.name} x {i.quantity}</div>
