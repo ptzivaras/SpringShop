@@ -1,7 +1,7 @@
 # SpringShop
 A massive eshop implemented with spring and react with many features
 
-Τι έβαλες με RTK Query και πώς δουλεύει (σύντομα)
+Τι έβαλα με RTK Query και πώς δουλεύει (σύντομα)
 1. baseApi (src/api/baseApi.js)
 -Φτιάξαμε ένα API “instance” με createApi και fetchBaseQuery('http://localhost:4000/').
 -Αυτό είναι το transport layer (αντί για useEffect/fetch/axios).
