@@ -24,7 +24,11 @@ import { useCreateOrderMutation } from '../api/ordersApi.js'
 import { setLastOrder } from '../features/orders/ordersSlice.js'
 
 import { useGetOrdersQuery } from '../api/ordersApi.js'
-// import { useGetProductsQuery } from '../api/productsApi.js'
+import {
+  useCreateProductMutation,
+  useDeleteProductMutation
+} from '../api/productsApi.js'
+
 
 function Nav() {
   const cartCount = useSelector(state =>
@@ -233,22 +237,56 @@ function AdminPage() {
   const { data: products = [], isLoading: pLoading } = useGetProductsQuery({})
   const { data: orders = [], isLoading: oLoading } = useGetOrdersQuery()
 
+  const [createProduct] = useCreateProductMutation()
+  const [deleteProduct] = useDeleteProductMutation()
+
+  async function handleAddProduct(e) {
+    e.preventDefault()
+    const form = e.target
+    const newProduct = {
+      name: form.name.value,
+      description: form.description.value,
+      price: parseFloat(form.price.value),
+      stockQty: parseInt(form.stockQty.value, 10),
+      createdAt: new Date().toISOString()
+    }
+    await createProduct(newProduct).unwrap()
+    form.reset()
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <h1 className="mb-4 text-2xl font-semibold">Admin Dashboard</h1>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Products list */}
+        {/* Products management */}
         <div className="rounded-xl border bg-white p-4 shadow-sm">
           <h2 className="mb-2 text-xl font-semibold">Products</h2>
+
+          <form onSubmit={handleAddProduct} className="mb-4 space-y-2">
+            <input name="name" placeholder="Name" className="w-full rounded-md border px-3 py-2 text-sm"/>
+            <input name="description" placeholder="Description" className="w-full rounded-md border px-3 py-2 text-sm"/>
+            <input name="price" type="number" placeholder="Price" className="w-full rounded-md border px-3 py-2 text-sm"/>
+            <input name="stockQty" type="number" placeholder="Stock Qty" className="w-full rounded-md border px-3 py-2 text-sm"/>
+            <button type="submit" className="w-full rounded-md border bg-gray-100 px-3 py-2 text-sm hover:bg-gray-200">Add Product</button>
+          </form>
+
           {pLoading && <div>Loading products…</div>}
           {!pLoading && products.length === 0 && <div>No products.</div>}
           {!pLoading && products.length > 0 && (
             <ul className="divide-y">
               {products.map(p => (
-                <li key={p.id} className="py-2">
-                  <div className="font-medium">{p.name}</div>
-                  <div className="text-sm text-gray-600">${p.price} | Stock: {p.stockQty}</div>
+                <li key={p.id} className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="font-medium">{p.name}</div>
+                    <div className="text-sm text-gray-600">${p.price} | Stock: {p.stockQty}</div>
+                  </div>
+                  <button
+                    onClick={() => deleteProduct(p.id)}
+                    className="rounded-md border px-2 py-1 text-xs hover:bg-red-50 hover:text-red-600"
+                  >
+                    Delete
+                  </button>
                 </li>
               ))}
             </ul>

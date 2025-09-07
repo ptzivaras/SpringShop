@@ -2,7 +2,6 @@ import { baseApi } from './baseApi.js'
 
 export const productsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // params: { page, limit, categoryId, search, sort, order }
     getProducts: builder.query({
       query: (params = {}) => {
         const {
@@ -23,12 +22,33 @@ export const productsApi = baseApi.injectEndpoints({
         if (search) qp.set('q', String(search))
 
         return `products?${qp.toString()}`
-      } // <-- σωστό: κλείνουμε την arrow function με }, όχι })
+      },
+      providesTags: ['Products'] // give tag to refresh the list
     }),
     getProductById: builder.query({
       query: (id) => `products/${id}`
+    }),
+    createProduct: builder.mutation({
+      query: (product) => ({
+        url: 'products',
+        method: 'POST',
+        body: product
+      }),
+      invalidatesTags: ['Products'] //efresh the list
+    }),
+    deleteProduct: builder.mutation({
+      query: (id) => ({
+        url: `products/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['Products']
     })
   })
 })
 
-export const { useGetProductsQuery, useGetProductByIdQuery } = productsApi
+export const {
+  useGetProductsQuery,
+  useGetProductByIdQuery,
+  useCreateProductMutation,
+  useDeleteProductMutation
+} = productsApi
