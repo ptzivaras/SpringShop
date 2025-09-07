@@ -29,6 +29,7 @@ import {
   useDeleteProductMutation
 } from '../api/productsApi.js'
 
+import AdminProductsPage from "./AdminProductsPage.jsx"
 
 function Nav() {
   const cartCount = useSelector(state =>
@@ -513,7 +514,10 @@ export default function AppRouter() {
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        {/* dashboard */}
         <Route path="/admin" element={<AdminPage/>} />
+        {/*  CRUD of produicts */}
+        <Route path="/admin/products" element={<AdminProductsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
