@@ -5,7 +5,7 @@ import { useGetProductsQuery, useGetProductByIdQuery } from '../api/productsApi.
 import { useGetCategoriesQuery } from '../api/categoriesApi.js'
 import { useGetReviewsByProductQuery } from '../api/reviewsApi.js'
 import { addToCart } from '../features/cart/cartSlice.js'
-// ✅ extra imports for CartPage actions (ΔΕΝ σβήνω τα δικά σου σχόλια παρακάτω)
+//extra imports for CartPage actions
 import {
   removeFromCart,
   increaseQuantity,
@@ -13,15 +13,18 @@ import {
   clearCart
 } from '../features/cart/cartSlice.js'
 
-// ✅ forms + validation + toasts
+//forms + validation + toasts
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Toaster, toast } from 'react-hot-toast'
 
-// ✅ Orders API + slice
+//Orders API + slice
 import { useCreateOrderMutation } from '../api/ordersApi.js'
 import { setLastOrder } from '../features/orders/ordersSlice.js'
+
+import { useGetOrdersQuery } from '../api/ordersApi.js'
+// import { useGetProductsQuery } from '../api/productsApi.js'
 
 function Nav() {
   const cartCount = useSelector(state =>
@@ -207,7 +210,7 @@ function HomePage() {
               <div className="min-h-[42px] text-sm text-gray-600">{p.description}</div>
               <div className="mt-2 font-semibold">${p.price}</div>
               <div className="text-xs text-gray-500">Stock: {p.stockQty}</div>
-              {/* ✅ κουμπί προσθήκης στο καλάθι */}
+              {/* κουμπί προσθήκης στο καλάθι */}
               <button
                 onClick={() => {
                   // απλό toast feedback
@@ -222,6 +225,54 @@ function HomePage() {
           ))}
         </ul>
       )}
+    </div>
+  )
+}
+
+function AdminPage() {
+  const { data: products = [], isLoading: pLoading } = useGetProductsQuery({})
+  const { data: orders = [], isLoading: oLoading } = useGetOrdersQuery()
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      <h1 className="mb-4 text-2xl font-semibold">Admin Dashboard</h1>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Products list */}
+        <div className="rounded-xl border bg-white p-4 shadow-sm">
+          <h2 className="mb-2 text-xl font-semibold">Products</h2>
+          {pLoading && <div>Loading products…</div>}
+          {!pLoading && products.length === 0 && <div>No products.</div>}
+          {!pLoading && products.length > 0 && (
+            <ul className="divide-y">
+              {products.map(p => (
+                <li key={p.id} className="py-2">
+                  <div className="font-medium">{p.name}</div>
+                  <div className="text-sm text-gray-600">${p.price} | Stock: {p.stockQty}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Orders list */}
+        <div className="rounded-xl border bg-white p-4 shadow-sm">
+          <h2 className="mb-2 text-xl font-semibold">Orders</h2>
+          {oLoading && <div>Loading orders…</div>}
+          {!oLoading && orders.length === 0 && <div>No orders yet.</div>}
+          {!oLoading && orders.length > 0 && (
+            <ul className="divide-y">
+              {orders.map(o => (
+                <li key={o.id} className="py-2">
+                  <div className="font-medium">{o.fullName} — ${o.total}</div>
+                  <div className="text-xs text-gray-600">{o.email}</div>
+                  <div className="text-xs text-gray-500">Items: {o.items.length}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -275,7 +326,7 @@ function ProductPage()  {
 
 // function CartPage()     { return <h1 style={{padding:20}}>Cart Page</h1> }
 
-// ✅ Checkout με react-hook-form + zod
+//Checkout με react-hook-form + zod
 const checkoutSchema = z.object({
   fullName: z.string().min(2, 'Enter your full name'),
   email: z.string().email('Invalid email'),
@@ -422,10 +473,9 @@ export default function AppRouter() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductPage />} />
-        {/* ✅ κάνουμε render το κανονικό CartPage component */}
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/admin" element={<h1 className="mx-auto max-w-6xl px-4 py-6">Admin Page</h1>} />
+        <Route path="/admin" element={<AdminPage/>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
