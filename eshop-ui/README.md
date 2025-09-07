@@ -1,23 +1,50 @@
-# React + Vite
+# E-Shop UI (React + Vite + Redux Toolkit + RTK Query)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Μικρό e-commerce front-end με mock backend (json-server). Περιλαμβάνει:
+- Προϊόντα με φίλτρα, ταξινόμηση, pagination (client-side λογική με json-server params)
+- Product details + Reviews
+- Καλάθι (Redux slice) με persist σε `localStorage`
+- Checkout με `react-hook-form` + `zod` + toasts
+- Orders (mock POST)
+- Admin: Dashboard + ξεχωριστή σελίδα **Products CRUD** (Create, Read, Update, Delete)
+- Styling με Tailwind (basic utility classes)
 
-Currently, two official plugins are available:
+> Στόχος: να δεις πλήρη ροή **RTK Query** (queries + mutations + cache invalidation).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Requirements
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Node 18+
+- npm / pnpm / yarn
+- (προαιρετικό) Git
 
-RTK Query έχει ήδη:
--baseQuery (fetchBaseQuery → χτίζεται πάνω από fetch)
--caching
--loading/error states
--automatic re-fetching & invalidation
+---
 
-Folder Structure
+## Εγκατάσταση
+
+```bash
+npm install
+
+## EndPoints
+
+GET /products?_page=1&_limit=8&_sort=createdAt&_order=desc
+
+GET /products/101
+
+POST /products
+
+PATCH /products/:id
+
+DELETE /products/:id
+
+GET /categories
+
+GET /reviews?productId=101
+
+POST /orders
+
+## Folder Structure
 src/
   app/            # redux store, root providers
   api/            # RTK Query api slices

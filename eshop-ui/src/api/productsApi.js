@@ -23,19 +23,31 @@ export const productsApi = baseApi.injectEndpoints({
 
         return `products?${qp.toString()}`
       },
-      providesTags: ['Products'] // give tag to refresh the list
+      providesTags: ['Products']
     }),
+
     getProductById: builder.query({
       query: (id) => `products/${id}`
     }),
+
     createProduct: builder.mutation({
       query: (product) => ({
         url: 'products',
         method: 'POST',
         body: product
       }),
-      invalidatesTags: ['Products'] //efresh the list
+      invalidatesTags: ['Products']
     }),
+
+    updateProduct: builder.mutation({
+      query: ({ id, patch }) => ({
+        url: `products/${id}`,
+        method: 'PATCH', // με json-server δουλεύει το PATCH
+        body: patch
+      }),
+      invalidatesTags: ['Products']
+    }),
+
     deleteProduct: builder.mutation({
       query: (id) => ({
         url: `products/${id}`,
@@ -50,5 +62,6 @@ export const {
   useGetProductsQuery,
   useGetProductByIdQuery,
   useCreateProductMutation,
+  useUpdateProductMutation,
   useDeleteProductMutation
 } = productsApi

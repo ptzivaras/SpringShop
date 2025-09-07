@@ -29,6 +29,7 @@ import {
   useDeleteProductMutation
 } from '../api/productsApi.js'
 
+// ✅ Admin Products CRUD page (ξεχωριστή σελίδα)
 import AdminProductsPage from "./AdminProductsPage.jsx"
 
 function Nav() {
@@ -47,6 +48,8 @@ function Nav() {
           </Link>
           <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/checkout">Checkout</Link>
           <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/admin">Admin</Link>
+          {/* Γρήγορο link κατευθείαν στο CRUD προϊόντων */}
+          <Link className="rounded-md px-3 py-2 text-sm hover:bg-gray-100" to="/admin/products">Products CRUD</Link>
         </div>
       </nav>
     </header>

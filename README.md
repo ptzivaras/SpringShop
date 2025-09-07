@@ -62,3 +62,4 @@ RTK Querry Μικρο recap
 -Κάθε endpoint παράγει έτοιμα hooks (π.χ. useGetProductsQuery) που διαχειρίζονται fetch, cache, loading/error αυτόματα, χωρίς useEffect/fetch.
 -Το baseApi.reducer + baseApi.middleware έχουν ήδη συνδεθεί στο Redux store, άρα η cache/κατάσταση ζει στο Redux—κοινή για όλο το app.
 
+
